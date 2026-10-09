@@ -32,6 +32,8 @@ pub enum Failure {
     Budget(Duration),
     /// It could not be started at all.
     Spawn(String),
+    /// The caller asked it to stop (a cancelled job).
+    Cancelled,
     /// It said nothing wrong but produced no file.
     NoOutput,
 }
@@ -67,9 +69,13 @@ pub fn run(
     output: &Path,
     budget: Duration,
     on_progress: &dyn Fn(f32),
+    should_stop: &dyn Fn() -> bool,
 ) -> Result<Report, (Failure, Report)> {
-    let (report, killed, said_success) = spawn(exe, args, budget, on_progress)?;
+    let (report, killed, said_success) = spawn(exe, args, budget, on_progress, should_stop)?;
     if killed {
+        if should_stop() {
+            return Err((Failure::Cancelled, report));
+        }
         return Err((Failure::Budget(budget), report));
     }
     if let Some(err) = report.errors.first() {
@@ -97,9 +103,13 @@ pub fn run_directory(
     args: &[String],
     budget: Duration,
     on_progress: &dyn Fn(f32),
+    should_stop: &dyn Fn() -> bool,
 ) -> Result<Report, (Failure, Report)> {
-    let (report, killed, _) = spawn(exe, args, budget, on_progress)?;
+    let (report, killed, _) = spawn(exe, args, budget, on_progress, should_stop)?;
     if killed {
+        if should_stop() {
+            return Err((Failure::Cancelled, report));
+        }
         return Err((Failure::Budget(budget), report));
     }
     Ok(report)
@@ -112,6 +122,7 @@ fn spawn(
     args: &[String],
     budget: Duration,
     on_progress: &dyn Fn(f32),
+    should_stop: &dyn Fn() -> bool,
 ) -> Result<(Report, bool, bool), (Failure, Report)> {
     let start = Instant::now();
     let mut cmd = Command::new(exe);
@@ -196,7 +207,7 @@ fn spawn(
             Ok(None) => {}
             Err(_) => break None,
         }
-        if start.elapsed() > budget {
+        if start.elapsed() > budget || should_stop() {
             let _ = child.kill();
             let _ = child.wait();
             killed = true;

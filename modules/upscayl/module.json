@@ -690,6 +690,521 @@
           "Auditing which models are installed"
         ]
       }
+    },
+    {
+      "id": "start_job",
+      "title": "Start upscale job",
+      "category": "jobs",
+      "description": "Queue an upscale (one image or a folder) and return at once with its job_id. Jobs run one at a time, survive the tool timeout, and keep the module running until they finish.",
+      "inputs": [
+        {
+          "name": "kind",
+          "type": "str",
+          "description": "image: one file (input, output). batch: a folder (input_folder, output_folder).",
+          "widget": "select",
+          "options": [
+            "image",
+            "batch"
+          ],
+          "default": "image",
+          "required": false
+        },
+        {
+          "name": "input",
+          "type": "str",
+          "description": "kind image: the image to upscale.",
+          "widget": "path",
+          "required": false
+        },
+        {
+          "name": "output",
+          "type": "str",
+          "description": "Where to write the result. Empty: beside the input, named like upstream (photo_upscayl_4x_<model>.png). A folder (ending in / or existing): inside it with that name. A file: exactly there, and its extension must match format.",
+          "widget": "path",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "input_folder",
+          "type": "str",
+          "description": "kind batch: The folder of images to upscale (PNG, JPEG, WebP; not subfolders). A relative path is relative to the open project's folder.",
+          "widget": "path",
+          "required": false,
+          "label": "input folder"
+        },
+        {
+          "name": "output_folder",
+          "type": "str",
+          "description": "kind batch: Where the results go. Empty: the input folder. Either way they land in a subfolder named upscayl_<format>_<model>_<size>, as Upscayl does, each file keeping its name.",
+          "widget": "path",
+          "default": "",
+          "required": false,
+          "label": "output folder"
+        },
+        {
+          "name": "model",
+          "type": "str",
+          "description": "A bundled model. Overridden by custom_model when that is set. Non-commercial models (Remacri, Ultramix, Ultrasharp) are CC BY-NC-SA 4.0.",
+          "widget": "select",
+          "options": [
+            "upscayl-standard-4x",
+            "upscayl-lite-4x",
+            "high-fidelity-4x",
+            "remacri-4x",
+            "ultramix-balanced-4x",
+            "ultrasharp-4x",
+            "digital-art-4x",
+            "realesr-animevideov3-x2",
+            "realesr-animevideov3-x3",
+            "realesr-animevideov3-x4"
+          ],
+          "default": "upscayl-standard-4x",
+          "required": false
+        },
+        {
+          "name": "custom_model",
+          "type": "str",
+          "description": "Overrides model: a .param file (its .bin beside it, both in a folder named models), or a model token from a model asset (upscayl:bundled/<name>).",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "model_scale",
+          "type": "int",
+          "description": "The model's native scale, sent as -z. 0 reads it from the name (x2/2x is 2, x3/3x is 3, else 4). A wrong value corrupts the output.",
+          "widget": "int",
+          "default": 0,
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "required": false,
+          "label": "model scale"
+        },
+        {
+          "name": "scale",
+          "type": "int",
+          "description": "Output scale, 1 to 16. Ignored when width or resize is set.",
+          "widget": "int",
+          "default": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "required": false
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "description": "Resize to this width in pixels, keeping aspect. 0 means unset. Cannot be combined with resize.",
+          "widget": "int",
+          "default": 0,
+          "min": 0,
+          "step": 1,
+          "required": false
+        },
+        {
+          "name": "resize",
+          "type": "str",
+          "description": "Resize to exact dimensions, WIDTHxHEIGHT (1920x1080); aspect is not kept. Empty means unset. Cannot be combined with width.",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "resize_filter",
+          "type": "str",
+          "description": "The filter for width or resize.",
+          "widget": "select",
+          "options": [
+            "default",
+            "box",
+            "triangle",
+            "cubicbspline",
+            "catmullrom",
+            "mitchell",
+            "pointsample"
+          ],
+          "default": "default",
+          "required": false,
+          "label": "resize filter"
+        },
+        {
+          "name": "format",
+          "type": "str",
+          "description": "Output format.",
+          "widget": "select",
+          "options": [
+            "png",
+            "jpg",
+            "webp"
+          ],
+          "default": "png",
+          "required": false
+        },
+        {
+          "name": "compression",
+          "type": "int",
+          "description": "WebP only: 0 to 100, higher is smaller and lossier. PNG and JPEG ignore it.",
+          "widget": "int",
+          "default": 0,
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "required": false
+        },
+        {
+          "name": "gpu_id",
+          "type": "str",
+          "description": "The GPU to use: empty for automatic, a number (0), or several (0,1).",
+          "widget": "string",
+          "default": "",
+          "required": false,
+          "label": "GPU"
+        },
+        {
+          "name": "tile_size",
+          "type": "str",
+          "description": "Tile size: 0 for automatic, or 32 and up; one per GPU (0,0). Smaller uses less VRAM and is slower.",
+          "widget": "string",
+          "default": "0",
+          "required": false,
+          "label": "tile size"
+        },
+        {
+          "name": "threads",
+          "type": "str",
+          "description": "Thread counts as load:proc:save, like 1:2:2. Empty for the engine's default.",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "tta",
+          "type": "bool",
+          "description": "Test-time augmentation: slower, sometimes cleaner.",
+          "widget": "bool",
+          "default": false,
+          "required": false,
+          "label": "TTA"
+        },
+        {
+          "name": "double_upscayl",
+          "type": "bool",
+          "description": "Run the model twice, the second time on the first result, as Upscayl's Double Upscayl does. scale applies to each pass, so scale 4 gives 16x. Compression, width, resize and TTA apply to the second pass only.",
+          "widget": "bool",
+          "default": false,
+          "required": false,
+          "label": "double upscayl"
+        },
+        {
+          "name": "copy_metadata",
+          "type": "bool",
+          "description": "Copy the input's metadata (EXIF, IPTC, XMP) to the output with the bundled exiftool.",
+          "widget": "bool",
+          "default": false,
+          "required": false,
+          "label": "copy metadata"
+        },
+        {
+          "name": "overwrite",
+          "type": "bool",
+          "description": "Replace the output if it already exists. Off: an existing output is refused.",
+          "widget": "bool",
+          "default": false,
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "name": "job_id",
+          "type": "str",
+          "description": "The job's id, for job_status, wait_job and cancel_job."
+        },
+        {
+          "name": "state",
+          "type": "str",
+          "description": "queued, running, done, failed, cancelled or interrupted."
+        },
+        {
+          "name": "finished",
+          "type": "bool",
+          "description": "True once the state is done, failed, cancelled or interrupted."
+        },
+        {
+          "name": "progress",
+          "type": "float",
+          "description": "0 to 100."
+        },
+        {
+          "name": "output",
+          "type": "str",
+          "description": "kind image, once done: the upscaled file."
+        },
+        {
+          "name": "outputs",
+          "type": "list[str]",
+          "description": "Every file written (one for kind image). Filled in when the job finishes."
+        },
+        {
+          "name": "failed",
+          "type": "list[str]",
+          "description": "kind batch, once finished: inputs not written, as \"name: reason\"."
+        },
+        {
+          "name": "error",
+          "type": "str",
+          "description": "Why the job failed, was cancelled or was interrupted; empty otherwise."
+        },
+        {
+          "name": "elapsed_ms",
+          "type": "int",
+          "description": "How long it has run."
+        }
+      ],
+      "effects": "writes",
+      "calls_model": false,
+      "doc": {
+        "what": "Starts an upscale that can run longer than one tool call.",
+        "how": "Checks the request the way upscale_image or upscale_batch would, queues it, and answers with the job's state. The job runs in the module, one at a time, and its record is kept in the module's data folder. A job the module was running when it stopped is marked interrupted, never re-run.",
+        "why": "The tool timeout (300 s by default) is too short for big batches, TTA or double upscayl.",
+        "best_uses": [
+          "A large folder from a scheduled graph",
+          "Starting work in one part of a graph and collecting it in another"
+        ]
+      }
+    },
+    {
+      "id": "job_status",
+      "title": "Job status",
+      "category": "jobs",
+      "description": "A job's state and progress, at once.",
+      "inputs": [
+        {
+          "name": "job_id",
+          "type": "str",
+          "description": "A job_id from start_job.",
+          "widget": "string",
+          "required": true,
+          "label": "job id"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "job_id",
+          "type": "str",
+          "description": "The job's id, for job_status, wait_job and cancel_job."
+        },
+        {
+          "name": "state",
+          "type": "str",
+          "description": "queued, running, done, failed, cancelled or interrupted."
+        },
+        {
+          "name": "finished",
+          "type": "bool",
+          "description": "True once the state is done, failed, cancelled or interrupted."
+        },
+        {
+          "name": "progress",
+          "type": "float",
+          "description": "0 to 100."
+        },
+        {
+          "name": "output",
+          "type": "str",
+          "description": "kind image, once done: the upscaled file."
+        },
+        {
+          "name": "outputs",
+          "type": "list[str]",
+          "description": "Every file written (one for kind image). Filled in when the job finishes."
+        },
+        {
+          "name": "failed",
+          "type": "list[str]",
+          "description": "kind batch, once finished: inputs not written, as \"name: reason\"."
+        },
+        {
+          "name": "error",
+          "type": "str",
+          "description": "Why the job failed, was cancelled or was interrupted; empty otherwise."
+        },
+        {
+          "name": "elapsed_ms",
+          "type": "int",
+          "description": "How long it has run."
+        }
+      ],
+      "effects": "reads",
+      "calls_model": false,
+      "doc": {
+        "what": "Reports a job's state.",
+        "how": "Reads the job's record. Never blocks.",
+        "why": "To branch on progress without waiting.",
+        "best_uses": [
+          "Polling from a loop",
+          "Showing progress"
+        ]
+      }
+    },
+    {
+      "id": "wait_job",
+      "title": "Wait for job",
+      "category": "jobs",
+      "description": "Wait until a job finishes or timeout_s passes, then answer with its state either way. Call it in a loop for jobs longer than one call.",
+      "inputs": [
+        {
+          "name": "job_id",
+          "type": "str",
+          "description": "A job_id from start_job.",
+          "widget": "string",
+          "required": true,
+          "label": "job id"
+        },
+        {
+          "name": "timeout_s",
+          "type": "int",
+          "description": "How long to wait, at most 280 s so the answer comes before the tool timeout.",
+          "widget": "int",
+          "default": 240,
+          "min": 0,
+          "max": 280,
+          "step": 1,
+          "required": false,
+          "label": "timeout (s)"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "job_id",
+          "type": "str",
+          "description": "The job's id, for job_status, wait_job and cancel_job."
+        },
+        {
+          "name": "state",
+          "type": "str",
+          "description": "queued, running, done, failed, cancelled or interrupted."
+        },
+        {
+          "name": "finished",
+          "type": "bool",
+          "description": "True once the state is done, failed, cancelled or interrupted."
+        },
+        {
+          "name": "progress",
+          "type": "float",
+          "description": "0 to 100."
+        },
+        {
+          "name": "output",
+          "type": "str",
+          "description": "kind image, once done: the upscaled file."
+        },
+        {
+          "name": "outputs",
+          "type": "list[str]",
+          "description": "Every file written (one for kind image). Filled in when the job finishes."
+        },
+        {
+          "name": "failed",
+          "type": "list[str]",
+          "description": "kind batch, once finished: inputs not written, as \"name: reason\"."
+        },
+        {
+          "name": "error",
+          "type": "str",
+          "description": "Why the job failed, was cancelled or was interrupted; empty otherwise."
+        },
+        {
+          "name": "elapsed_ms",
+          "type": "int",
+          "description": "How long it has run."
+        }
+      ],
+      "effects": "reads",
+      "calls_model": false,
+      "doc": {
+        "what": "Waits for a job.",
+        "how": "Blocks until the job is done, failed, cancelled or interrupted, or until timeout_s; finished says which.",
+        "why": "Collecting a job's outputs in a graph.",
+        "best_uses": [
+          "Waiting for a batch before the next step"
+        ]
+      }
+    },
+    {
+      "id": "cancel_job",
+      "title": "Cancel job",
+      "category": "jobs",
+      "description": "Stop a queued or running job. Files already written stay.",
+      "inputs": [
+        {
+          "name": "job_id",
+          "type": "str",
+          "description": "A job_id from start_job.",
+          "widget": "string",
+          "required": true,
+          "label": "job id"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "job_id",
+          "type": "str",
+          "description": "The job's id, for job_status, wait_job and cancel_job."
+        },
+        {
+          "name": "state",
+          "type": "str",
+          "description": "queued, running, done, failed, cancelled or interrupted."
+        },
+        {
+          "name": "finished",
+          "type": "bool",
+          "description": "True once the state is done, failed, cancelled or interrupted."
+        },
+        {
+          "name": "progress",
+          "type": "float",
+          "description": "0 to 100."
+        },
+        {
+          "name": "output",
+          "type": "str",
+          "description": "kind image, once done: the upscaled file."
+        },
+        {
+          "name": "outputs",
+          "type": "list[str]",
+          "description": "Every file written (one for kind image). Filled in when the job finishes."
+        },
+        {
+          "name": "failed",
+          "type": "list[str]",
+          "description": "kind batch, once finished: inputs not written, as \"name: reason\"."
+        },
+        {
+          "name": "error",
+          "type": "str",
+          "description": "Why the job failed, was cancelled or was interrupted; empty otherwise."
+        },
+        {
+          "name": "elapsed_ms",
+          "type": "int",
+          "description": "How long it has run."
+        }
+      ],
+      "effects": "writes",
+      "calls_model": false,
+      "doc": {
+        "what": "Cancels a job.",
+        "how": "A queued job is removed from the queue; a running one has its engine process stopped. Answers once the job reads cancelled, or after 5 s.",
+        "why": "Stopping work that is no longer wanted.",
+        "best_uses": [
+          "A stop button",
+          "Abandoning a stale batch"
+        ]
+      }
     }
   ]
 }

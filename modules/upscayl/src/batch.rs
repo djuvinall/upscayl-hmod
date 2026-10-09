@@ -68,7 +68,7 @@ pub fn handle(req: &Request, ctx: &ModuleContext) -> Response {
         Ok(c) => c,
         Err(e) => return Response::error(400, &e),
     };
-    match run(&call, ctx, upscale::budget(), &|_| {}) {
+    match run(&call, ctx, upscale::budget(), &|_| {}, &|| false) {
         Ok(v) => Response::json(200, &Value::object().with("outputs", v)),
         Err((status, msg)) => Response::error(status, &msg),
     }
@@ -80,6 +80,7 @@ pub fn run(
     ctx: &ModuleContext,
     budget: Duration,
     on_progress: &dyn Fn(f32),
+    should_stop: &dyn Fn() -> bool,
 ) -> Result<Value, (u16, String)> {
     let started = Instant::now();
     let bad = |m: String| (400u16, m);
@@ -147,6 +148,10 @@ pub fn run(
                 .unwrap_or("?")
                 .to_string();
             let remaining = budget.saturating_sub(started.elapsed());
+            if should_stop() {
+                failed.push(format!("{name}: not processed, the job was cancelled"));
+                continue;
+            }
             if remaining.is_zero() {
                 failed.push(format!(
                     "{name}: not processed, the call's budget ran out; run this batch with start_job"
@@ -162,9 +167,13 @@ pub fn run(
                     }
                 };
             let offset = i as f32;
-            match upscale::execute(&job, ctx, remaining, &|p| {
-                on_progress((offset + p / 100.0) / n * 100.0)
-            }) {
+            match upscale::execute(
+                &job,
+                ctx,
+                remaining,
+                &|p| on_progress((offset + p / 100.0) / n * 100.0),
+                should_stop,
+            ) {
                 Ok(_) => outputs.push(target(f).display().to_string()),
                 Err((_, m)) => failed.push(format!("{name}: {m}")),
             }
@@ -185,10 +194,10 @@ pub fn run(
                 )
             })
             .collect();
-        let result = engine::run_directory(&probe.exe, &argv, budget, on_progress);
+        let result = engine::run_directory(&probe.exe, &argv, budget, on_progress, should_stop);
         let (report, killed) = match result {
             Ok(r) => (r, false),
-            Err((Failure::Budget(_), r)) => (r, true),
+            Err((Failure::Budget(_) | Failure::Cancelled, r)) => (r, true),
             Err((Failure::Spawn(e), _)) => return Err((500, e)),
             Err((_, r)) => (r, false),
         };

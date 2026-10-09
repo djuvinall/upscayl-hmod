@@ -10,6 +10,7 @@ mod args;
 mod assets;
 mod batch;
 mod engine;
+mod jobs;
 mod models;
 mod paths;
 mod resolve;
@@ -27,6 +28,9 @@ fn main() -> Result<(), String> {
         "the Upscayl module is coming up",
         &[("port".to_string(), Value::from(ctx.port))],
     );
+    // Recover the job table now: a job the last process left running is marked
+    // interrupted at start, not when someone next asks.
+    jobs::Jobs::get(&ctx);
     server::serve(build(ctx), routes())
 }
 
@@ -38,6 +42,13 @@ fn build(ctx: ModuleContext) -> Module {
         .tool("upscale_batch", batch::handle)
         .tool("import_model", assets::import_model)
         .tool("list_models", assets::list_models)
+        .tool("start_job", jobs::start_job)
+        .tool("job_status", jobs::job_status)
+        .tool("wait_job", jobs::wait_job)
+        .tool("cancel_job", jobs::cancel_job)
+        .get("/api/jobs", jobs::list)
+        // A running or queued job keeps the module alive while nobody is watching.
+        .hold_while(|_| jobs::busy_now())
         .get("/api/assets", assets::list)
         .post("/api/assets", assets::create)
         .get("/module.json", |_req, ctx| {
@@ -386,6 +397,7 @@ print("ok", len(d["summaries"]), len(d["full"]))
 "#;
         let vendor = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("vendor");
         let out = match std::process::Command::new("python")
+            .env("PYTHONDONTWRITEBYTECODE", "1")
             .arg("-c")
             .arg(script)
             .arg(&vendor)
