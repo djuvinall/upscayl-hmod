@@ -20,6 +20,8 @@ pub struct Report {
     /// The last progress value seen, 0 to 100.
     pub progress: f32,
     pub stderr_tail: Vec<String>,
+    /// Every `Error:` sentence the engine printed, in order.
+    pub errors: Vec<String>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -58,7 +60,7 @@ pub fn error_text(line: &str) -> Option<String> {
     Some(line[i + "Error:".len()..].trim().to_string())
 }
 
-/// Run the engine. `on_progress` is called with each new progress value.
+/// Run the engine on one image. `on_progress` is called with each new progress value.
 pub fn run(
     exe: &Path,
     args: &[String],
@@ -66,6 +68,51 @@ pub fn run(
     budget: Duration,
     on_progress: &dyn Fn(f32),
 ) -> Result<Report, (Failure, Report)> {
+    let (report, killed, said_success) = spawn(exe, args, budget, on_progress)?;
+    if killed {
+        return Err((Failure::Budget(budget), report));
+    }
+    if let Some(err) = report.errors.first() {
+        return Err((Failure::Engine(err.clone()), report));
+    }
+    if !said_success || !output.is_file() {
+        if let Some(code) = report.exit_code.filter(|c| *c != 0) {
+            let tail = report.stderr_tail.join(" / ");
+            return Err((
+                Failure::Engine(format!("the engine exited with code {code}: {tail}")),
+                report,
+            ));
+        }
+        return Err((Failure::NoOutput, report));
+    }
+    Ok(report)
+}
+
+/// Run the engine in directory mode. Per-file errors do not fail the run -- the engine
+/// carries on past an unreadable file (finding 12) -- so the caller reads
+/// `Report::errors` and checks each expected output itself. Only a failure to start, or
+/// running past the budget, is an `Err`.
+pub fn run_directory(
+    exe: &Path,
+    args: &[String],
+    budget: Duration,
+    on_progress: &dyn Fn(f32),
+) -> Result<Report, (Failure, Report)> {
+    let (report, killed, _) = spawn(exe, args, budget, on_progress)?;
+    if killed {
+        return Err((Failure::Budget(budget), report));
+    }
+    Ok(report)
+}
+
+/// Spawn, read stderr, enforce the budget. Returns the report, whether it was killed,
+/// and whether the success line appeared.
+fn spawn(
+    exe: &Path,
+    args: &[String],
+    budget: Duration,
+    on_progress: &dyn Fn(f32),
+) -> Result<(Report, bool, bool), (Failure, Report)> {
     let start = Instant::now();
     let mut cmd = Command::new(exe);
     cmd.args(args)
@@ -86,6 +133,7 @@ pub fn run(
         exit_code: None,
         progress: 0.0,
         stderr_tail: vec![],
+        errors: vec![],
     };
     let mut child = match cmd.spawn() {
         Ok(c) => c,
@@ -164,6 +212,7 @@ pub fn run(
         exit_code: status.and_then(|s| s.code()),
         progress: *progress.lock().expect("progress lock"),
         // GPU capability lines are noise in a refusal; keep what follows them.
+        errors: all.iter().filter_map(|l| error_text(l)).collect(),
         stderr_tail: {
             let kept: Vec<String> = all
                 .iter()
@@ -173,24 +222,8 @@ pub fn run(
             kept[kept.len().saturating_sub(6)..].to_vec()
         },
     };
-    if killed {
-        return Err((Failure::Budget(budget), report));
-    }
-    if let Some(err) = all.iter().find_map(|l| error_text(l)) {
-        return Err((Failure::Engine(err), report));
-    }
     let said_success = all.iter().any(|l| l.contains(SUCCESS_LINE));
-    if !said_success || !output.is_file() {
-        if let Some(code) = report.exit_code.filter(|c| *c != 0) {
-            let tail = report.stderr_tail.join(" / ");
-            return Err((
-                Failure::Engine(format!("the engine exited with code {code}: {tail}")),
-                report,
-            ));
-        }
-        return Err((Failure::NoOutput, report));
-    }
-    Ok(report)
+    Ok((report, killed, said_success))
 }
 
 #[cfg(test)]

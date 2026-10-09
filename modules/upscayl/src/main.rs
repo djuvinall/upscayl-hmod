@@ -7,6 +7,7 @@
 use hollowdeck_module::{json::Value, Module, ModuleContext, Request, Response};
 
 mod args;
+mod batch;
 mod engine;
 mod models;
 mod paths;
@@ -32,6 +33,7 @@ fn build(ctx: ModuleContext) -> Module {
     Module::new(ctx)
         .get("/api/status", status)
         .tool("upscale_image", upscale::handle)
+        .tool("upscale_batch", batch::handle)
         .get("/module.json", |_req, ctx| {
             match std::fs::read(ctx.module_path("module.json")) {
                 Ok(bytes) => Response::new(200, "application/json", bytes),
