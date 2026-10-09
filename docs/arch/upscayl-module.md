@@ -50,4 +50,6 @@ Planned routes beyond the contract's: `api/assets` (the asset surface, see `mode
 
 ## Notes
 
+- Performance (#7, `docs/results/perf-baseline.md`): keep `tile_size` 0 as the default; large models take about 4.5 s per input megapixel at 4x (about 16.5 s with TTA). A double run with a large model and TTA over about 1 MP belongs in a job.
+
 - `.hmod` size is dominated by models (~150 MB for the bundled set). Whether every model ships bundled is decided per model by its license.
