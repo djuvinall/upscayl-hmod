@@ -2,3 +2,6 @@
 # Neither is source; both are reproducible.
 target/
 engine/
+
+# Python bytecode from the assets.py round-trip test.
+__pycache__/
