@@ -1,11 +1,70 @@
-/* The Upscayl panel -- only what is this module's own. Everything generic (.btn,
- * .diag, .mono, k-panel, k-rows) comes from the vendored kit in static/vendor/.
- * No literal colours: every colour is a var(--darkglass-*) token. */
+/* The Upscayl panel -- only what is this module's own. Everything generic comes from
+ * the vendored kit in static/vendor/. No literal colours: every colour is a
+ * var(--darkglass-*) token. Sizes in rem or tokens, never px (borders aside). */
 
 .upscayl-page {
   padding: var(--darkglass-dimension-space-5);
   display: flex;
   flex-direction: column;
-  gap: var(--darkglass-dimension-space-5);
+  gap: var(--darkglass-dimension-space-4);
   min-height: 100%;
+}
+
+/* Two panes side by side when there is room, stacked when there is not. */
+.upscayl-panes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  gap: var(--darkglass-dimension-space-4);
+  align-items: start;
+}
+
+.upscayl-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--darkglass-dimension-space-4);
+}
+
+.upscayl-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--darkglass-dimension-space-2);
+  padding-top: var(--darkglass-dimension-space-3);
+}
+
+.upscayl-license {
+  margin: var(--darkglass-dimension-space-2) 0;
+  color: var(--darkglass-text-secondary);
+  font-size: var(--darkglass-typography-size-caption);
+}
+
+.upscayl-license[data-commercial="forbidden"] {
+  color: var(--darkglass-text-warning);
+}
+
+.upscayl-jobs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--darkglass-dimension-space-3);
+}
+
+.upscayl-job {
+  display: flex;
+  flex-direction: column;
+  gap: var(--darkglass-dimension-space-1);
+}
+
+.upscayl-job__head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--darkglass-dimension-space-2);
+  align-items: baseline;
+}
+
+.upscayl-job__detail {
+  color: var(--darkglass-text-secondary);
+  font-size: var(--darkglass-typography-size-caption);
+  overflow-wrap: anywhere;
 }

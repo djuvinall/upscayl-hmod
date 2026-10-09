@@ -11,44 +11,106 @@
   <link rel="stylesheet" href="static/panel.css">
 </head>
 <body>
-  <main class="upscayl-page">
-    <section class="k-panel" id="panel" data-status="loading" data-testid="status-panel">
-      <header class="k-panel__header">
-        <span class="k-panel__title" data-view-title>Upscayl</span>
-        <span class="k-badge" id="status" data-tone="accent" data-testid="status">loading</span>
-      </header>
-      <div class="k-panel__body">
-        <div class="diag error" id="error" data-testid="error" hidden>
-          <span>&#x2715;</span>
-          <div id="error-text"></div>
-        </div>
-        <div class="k-skeleton" id="skeleton" data-testid="skeleton"></div>
+  <main class="upscayl-page" id="page" data-status="loading">
+    <hd-report id="setup" severity="warning" hidden data-testid="setup"></hd-report>
+    <hd-report id="error" severity="error" hidden data-testid="error"></hd-report>
+
+    <div class="upscayl-panes">
+      <!-- Left: what to upscale and how. -->
+      <hd-panel heading="Upscale" id="form" data-testid="form">
         <hd-props>
-          <div class="k-rows" data-density="dense" id="details" hidden>
-            <div class="k-row">
-              <span class="k-row__label">Version</span>
-              <span class="k-row__value mono" data-detail="version">&ndash;</span>
-            </div>
-            <div class="k-row">
-              <span class="k-row__label">Engine</span>
-              <span class="k-row__value" data-detail="engine">&ndash;</span>
-            </div>
-            <div class="k-row">
-              <span class="k-row__label">Model licenses</span>
-              <span class="k-row__value" data-detail="licenses">&ndash;</span>
-            </div>
-            <div class="k-row">
-              <span class="k-row__label">Data directory</span>
-              <span class="k-row__value mono" data-detail="data_dir">&ndash;</span>
-            </div>
-          </div>
+          <hd-radio-row id="mode" label="Mode" value="image">
+            <option value="image">Image</option>
+            <option value="batch">Folder</option>
+          </hd-radio-row>
+          <hd-path id="input" label="Image" kind="file" data-mode="image"
+                   placeholder="Paste a full path (Copy as path works)"></hd-path>
+          <hd-path id="output" label="Save to" kind="dir" data-mode="image"
+                   placeholder="Empty: beside the image"></hd-path>
+          <hd-path id="input_folder" label="Folder" kind="dir" data-mode="batch" hidden></hd-path>
+          <hd-path id="output_folder" label="Save to" kind="dir" data-mode="batch" hidden
+                   placeholder="Empty: inside the folder"></hd-path>
+          <hd-enum id="model" label="Model" loading></hd-enum>
         </hd-props>
+        <p class="upscayl-license" id="license" data-testid="license"></p>
+        <hd-props>
+          <hd-radio-row id="size_mode" label="Size" value="scale">
+            <option value="scale">Scale</option>
+            <option value="width">Width</option>
+            <option value="resize">Exact</option>
+          </hd-radio-row>
+          <hd-number id="scale" label="Scale" value="4" min="1" max="16" step="1" integer unit="x" default="4"></hd-number>
+          <hd-number id="width" label="Width" value="1920" min="1" step="1" integer unit="px" default="1920" hidden></hd-number>
+          <hd-text id="resize" label="Exact size" value="1920x1080" default="1920x1080" mono hidden></hd-text>
+          <hd-enum id="resize_filter" label="Filter" value="default" hidden>
+            <option value="default">Default</option>
+            <option value="box">Box</option>
+            <option value="triangle">Triangle</option>
+            <option value="cubicbspline">Cubic B-spline</option>
+            <option value="catmullrom">Catmull-Rom</option>
+            <option value="mitchell">Mitchell</option>
+            <option value="pointsample">Point sample</option>
+          </hd-enum>
+          <hd-enum id="format" label="Format" value="png">
+            <option value="png">PNG</option>
+            <option value="jpg">JPEG</option>
+            <option value="webp">WebP</option>
+          </hd-enum>
+          <hd-number id="compression" label="Compression" value="0" min="0" max="100" step="1" integer default="0"
+                     tooltip="WebP only: higher is smaller and lossier" disabled></hd-number>
+          <hd-checkbox id="tta" label="TTA (slower, sometimes cleaner)"></hd-checkbox>
+          <hd-checkbox id="double_upscayl" label="Double upscayl"></hd-checkbox>
+          <hd-checkbox id="copy_metadata" label="Copy metadata"></hd-checkbox>
+          <hd-checkbox id="overwrite" label="Overwrite existing"></hd-checkbox>
+        </hd-props>
+        <hd-panel heading="Advanced" id="advanced" collapsed>
+          <hd-props>
+            <hd-text id="gpu_id" label="GPU" value="" placeholder="auto, 0, or 0,1" mono></hd-text>
+            <hd-text id="tile_size" label="Tile size" value="0" default="0" mono></hd-text>
+            <hd-text id="threads" label="Threads" value="" placeholder="load:proc:save" mono></hd-text>
+            <hd-number id="model_scale" label="Model scale" value="0" min="0" max="4" step="1" integer default="0"
+                       tooltip="0 reads it from the model name"></hd-number>
+            <hd-text id="custom_model" label="Custom model" value=""
+                     placeholder="a .param path, or upscayl:imported/<id>" mono></hd-text>
+          </hd-props>
+        </hd-panel>
+        <div class="upscayl-actions">
+          <hd-button id="start" variant="primary" data-hdeck-focus-first data-testid="start">Upscale</hd-button>
+        </div>
+      </hd-panel>
+
+      <div class="upscayl-side">
+        <!-- Right, top: what is running and what finished. -->
+        <hd-panel heading="Jobs" id="jobs-panel" data-testid="jobs">
+          <div class="k-skeleton" id="jobs-skeleton"></div>
+          <p class="pane-hint" id="jobs-empty" hidden>No jobs yet. Started jobs, and their outputs, appear here.</p>
+          <ul class="upscayl-jobs" id="jobs"></ul>
+        </hd-panel>
+
+        <!-- Right, bottom: the models and their licenses. -->
+        <hd-panel heading="Models" id="models-panel" data-testid="models">
+          <div class="k-skeleton" id="models-skeleton"></div>
+          <div class="k-rows" data-density="dense" id="models"></div>
+          <hd-panel heading="Import a model" id="import" collapsed>
+            <hd-props>
+              <hd-path id="imp_param" label=".param file" kind="file"></hd-path>
+              <hd-text id="imp_name" label="Name" value="" placeholder="Empty: the file name"></hd-text>
+              <hd-text id="imp_license" label="License" value="" placeholder="SPDX id, e.g. CC-BY-4.0" mono></hd-text>
+              <hd-enum id="imp_commercial" label="Commercial use" value="unknown">
+                <option value="unknown">Unknown</option>
+                <option value="allowed">Allowed</option>
+                <option value="forbidden">Forbidden</option>
+              </hd-enum>
+              <hd-text id="imp_source" label="Source URL" value=""></hd-text>
+              <hd-text id="imp_attribution" label="Attribution" value=""></hd-text>
+            </hd-props>
+            <div class="upscayl-actions">
+              <hd-button id="imp_go" data-testid="import">Import</hd-button>
+            </div>
+          </hd-panel>
+        </hd-panel>
       </div>
-      <footer class="k-panel__footer">
-        <button class="btn" id="refresh" type="button" data-testid="refresh"
-                data-hdeck-focus-first>Refresh</button>
-      </footer>
-    </section>
+    </div>
   </main>
   <script src="static/vendor/module.js"></script>
   <script src="static/vendor/kit.js"></script>

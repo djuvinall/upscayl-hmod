@@ -1,4 +1,4 @@
-# upscayl-module (built: tools #9–#13; panel in progress, #14)
+# upscayl-module (built: tools #9–#13, panel #14)
 
 **Responsibility:** expose every engine capability to HollowDeck as tool nodes, supervise engine processes, and own the model assets. Rust, `kind: process`, id `upscayl`, at `modules/upscayl/`.
 
@@ -31,6 +31,8 @@ Built (#9): `POST tools/upscale_image`. Outputs `output`, `width`, `height`, `el
 Built (#5): `GET api/status` → `{version, platform, engine_staged, engine_path, licenses_present, data_dir}`, which the panel renders; `GET /module.json` read from the file; `--selfcheck` (the manifest's `verify`) checks `module.json`, `static/index.html` and `licenses/models.json` exist.
 
 Built routes beyond the contract's: `GET/POST api/assets`, `GET/DELETE api/assets/{id}` (see `model-assets.md`) and `GET api/jobs` (see `jobs.md`).
+
+Built (#14): the panel (`static/`, plain JS, kit components, tokens only). Two panes: **Upscale** (image or folder, every setting of the tools, an Advanced section for `gpu_id`/`tile_size`/`threads`/`model_scale`/`custom_model`, the picked model's license and commercial-use line) and **Jobs + Models** (every job with an `hd-progress` bar and cancel, polled from `api/jobs` every 1 s while one is active and 5 s otherwise; the models with license, commercial use and staged state; an import form calling `import_model`). Work goes through `start_job`, never the synchronous tools, so the page never holds a request open. Job rows are updated in place, not rebuilt, so a click on cancel is not lost to a poll. A poll error clears on the next good poll. Progress for a folder counts files (#28); a chunked progress stream was dropped for polling, which the job record already supports.
 
 **SDK limit, handled:** `hollowdeck-module` routes match exact paths only, so `src/server.rs` runs this module's own accept loop for `GET/DELETE api/assets/{id}`: `http::read_request`, `Module::refuse` (the SDK's guard, unchanged), the prefix routes, then `Module::answer`. A streaming route added later goes through this loop too.
 
