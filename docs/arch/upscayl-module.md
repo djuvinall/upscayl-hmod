@@ -12,7 +12,7 @@ Tools in `module.json` (node types `upscayl/<id>`). Ids and socket names are per
 |---|---|---|
 | `upscale_image` | one image, synchronous; **built (#9)** | `writes` (decided: the effect a person sees is a written file; the binary it runs is fixed, not caller-chosen) |
 | `upscale_batch` | a directory, synchronous; **built (#11)** | `writes` |
-| `start_job` / `job_status` / `wait_job` / `cancel_job` | asynchronous form of the above (see `jobs.md`) | `writes` / `reads` / `reads` / `writes` |
+| `start_job` / `job_status` / `wait_job` / `cancel_job` | asynchronous form of the above (see `jobs.md`); **built (#13)** | `writes` / `reads` / `reads` / `writes` |
 | `list_models` | bundled + imported models with their licenses; **built (#12)** | `reads` |
 | `import_model` | copy a `.param`/`.bin` pair into the module's data dir and create its asset; **built (#12)** | `writes` |
 

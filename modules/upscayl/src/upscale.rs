@@ -262,7 +262,7 @@ pub fn handle(req: &Request, ctx: &ModuleContext) -> Response {
         Ok(j) => j,
         Err((status, msg)) => return Response::error(status, &msg),
     };
-    match execute(&job, ctx, budget(), &|_| {}) {
+    match execute(&job, ctx, budget(), &|_| {}, &|| false) {
         Ok(v) => Response::json(200, &Value::object().with("outputs", v)),
         Err((status, msg)) => Response::error(status, &msg),
     }
@@ -447,6 +447,7 @@ fn failure_message(f: Failure, output: &Path, tail: &[String]) -> (u16, String) 
             ),
         ),
         Failure::Spawn(e) => (500, e),
+        Failure::Cancelled => (499, "cancelled".to_string()),
         Failure::NoOutput => (
             500,
             format!(
@@ -464,6 +465,7 @@ pub fn execute(
     ctx: &ModuleContext,
     budget: Duration,
     on_progress: &dyn Fn(f32),
+    should_stop: &dyn Fn() -> bool,
 ) -> Result<Value, (u16, String)> {
     let started = std::time::Instant::now();
     let tmp_dir = ctx.data_path("tmp");
@@ -488,9 +490,14 @@ pub fn execute(
         argvs.push(argv.join(" "));
         let remaining = budget.saturating_sub(started.elapsed());
         let offset = i as f32;
-        let r = engine::run(&job.exe, &argv, &plan.output, remaining, &|p| {
-            on_progress((offset + p / 100.0) / n * 100.0)
-        });
+        let r = engine::run(
+            &job.exe,
+            &argv,
+            &plan.output,
+            remaining,
+            &|p| on_progress((offset + p / 100.0) / n * 100.0),
+            should_stop,
+        );
         match r {
             Ok(rep) => {
                 last_exit = rep.exit_code;
