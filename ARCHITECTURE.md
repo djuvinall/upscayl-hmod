@@ -26,6 +26,6 @@ Upstream's Electron app is a GUI over one CLI binary, `upscayl-bin` (the upscayl
 
 ## Known unknowns
 
-- Each bundled model's license. Resolved by the model-license research issue; no model ships in a `.hmod` until its license is recorded.
+- Whether the three non-commercial (CC BY-NC-SA) models ship inside the `.hmod` or as an optional download (`docs/results/model-licenses.md`).
 - Per-graph timeout override and per-job triggers are **Orchestrator features**, not this repo's (see `docs/arch/jobs.md`). They need issues on `djuvinall/Orchestrator`.
 - CI: the SDK lives in a private repo; how a public fork's CI builds against it is undecided (`decisions.md`).
