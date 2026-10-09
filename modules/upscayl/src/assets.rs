@@ -498,9 +498,9 @@ fn tool_ok(outputs: Json) -> Response {
 /// `POST tools/import_model`: copy a `.param`/`.bin` pair into the module's data dir and
 /// publish it as an `ncnn_model` asset with the license the caller states.
 pub fn import_model(req: &Request, ctx: &ModuleContext) -> Response {
-    let call = match Call::parse(req) {
+    let call = match Call::parse_for(req, ctx, "import_model") {
         Ok(c) => c,
-        Err(e) => return Response::error(400, &e),
+        Err((s, e)) => return Response::error(s, &e),
     };
     match import(&call, ctx) {
         Ok(v) => tool_ok(v),

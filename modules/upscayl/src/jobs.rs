@@ -351,9 +351,9 @@ pub fn view(rec: &Json) -> Json {
 
 /// `POST tools/start_job`.
 pub fn start_job(req: &Request, ctx: &ModuleContext) -> Response {
-    let call = match Call::parse(req) {
+    let call = match Call::parse_for(req, ctx, "start_job") {
         Ok(c) => c,
-        Err(e) => return Response::error(400, &e),
+        Err((s, e)) => return Response::error(s, &e),
     };
     let kind = match call.str("kind").to_ascii_lowercase().as_str() {
         "" | "image" => "image",
@@ -372,6 +372,16 @@ pub fn start_job(req: &Request, ctx: &ModuleContext) -> Response {
         }
         if call.str("input_folder").is_empty() {
             return Response::error(400, "input_folder is empty: a batch job needs a folder");
+        }
+        let model_scale = call.int("model_scale", 0).unwrap_or(0).clamp(0, 4) as u32;
+        if let Err(m) = crate::models::resolve_model(
+            ctx,
+            &call.base,
+            &call.str("model"),
+            &call.str("custom_model"),
+            model_scale,
+        ) {
+            return Response::error(400, &m);
         }
     }
     let rec = Jobs::get(ctx).submit(kind, &call);
@@ -401,9 +411,9 @@ fn not_found(id: &str) -> Response {
 
 /// `POST tools/job_status`.
 pub fn job_status(req: &Request, ctx: &ModuleContext) -> Response {
-    let call = match Call::parse(req) {
+    let call = match Call::parse_for(req, ctx, "job_status") {
         Ok(c) => c,
-        Err(e) => return Response::error(400, &e),
+        Err((s, e)) => return Response::error(s, &e),
     };
     let id = match job_id(&call) {
         Ok(i) => i,
@@ -418,9 +428,9 @@ pub fn job_status(req: &Request, ctx: &ModuleContext) -> Response {
 /// `POST tools/wait_job`: block until the job finishes or `timeout_s` passes, then
 /// answer with its state either way.
 pub fn wait_job(req: &Request, ctx: &ModuleContext) -> Response {
-    let call = match Call::parse(req) {
+    let call = match Call::parse_for(req, ctx, "wait_job") {
         Ok(c) => c,
-        Err(e) => return Response::error(400, &e),
+        Err((s, e)) => return Response::error(s, &e),
     };
     let id = match job_id(&call) {
         Ok(i) => i,
@@ -439,9 +449,9 @@ pub fn wait_job(req: &Request, ctx: &ModuleContext) -> Response {
 
 /// `POST tools/cancel_job`.
 pub fn cancel_job(req: &Request, ctx: &ModuleContext) -> Response {
-    let call = match Call::parse(req) {
+    let call = match Call::parse_for(req, ctx, "cancel_job") {
         Ok(c) => c,
-        Err(e) => return Response::error(400, &e),
+        Err((s, e)) => return Response::error(s, &e),
     };
     let id = match job_id(&call) {
         Ok(i) => i,
