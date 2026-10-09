@@ -248,27 +248,66 @@ pub fn output_path(
     Ok(resolved)
 }
 
+/// A per-process counter for intermediate file names, so concurrent double runs never
+/// share one.
+static NEXT_TMP: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
 /// `POST tools/upscale_image`.
 pub fn handle(req: &Request, ctx: &ModuleContext) -> Response {
     let call = match Call::parse(req) {
         Ok(c) => c,
         Err(e) => return Response::error(400, &e),
     };
-    match run(&call, ctx) {
+    let job = match prepare(&call, ctx) {
+        Ok(j) => j,
+        Err((status, msg)) => return Response::error(status, &msg),
+    };
+    match execute(&job, ctx, budget(), &|_| {}) {
         Ok(v) => Response::json(200, &Value::object().with("outputs", v)),
         Err((status, msg)) => Response::error(status, &msg),
     }
 }
 
-fn run(call: &Call, ctx: &ModuleContext) -> Result<Value, (u16, String)> {
+/// One image's work, decided and checked, before anything runs.
+#[derive(Clone, Debug)]
+pub struct Prepared {
+    pub plan: Plan,
+    pub model: models::Resolved,
+    pub double: bool,
+    pub copy_metadata: bool,
+    pub exe: PathBuf,
+}
+
+/// The largest side each format can hold. WebP stops at 16383 px; JPEG at 65535.
+fn format_limit(format: &str) -> Option<u64> {
+    match format {
+        "webp" => Some(16_383),
+        "jpg" => Some(65_535),
+        _ => None,
+    }
+}
+
+/// Resolve, validate and plan one image without running anything. `output_override`
+/// replaces the `output` socket (batch passes each file's own target).
+pub fn prepare(call: &Call, ctx: &ModuleContext) -> Result<Prepared, (u16, String)> {
+    prepare_with(call, ctx, &call.str("input"), None)
+}
+
+pub fn prepare_with(
+    call: &Call,
+    ctx: &ModuleContext,
+    raw_input: &str,
+    output_override: Option<PathBuf>,
+) -> Result<Prepared, (u16, String)> {
     let bad = |m: String| (400u16, m);
     let s = settings(call).map_err(bad)?;
-    let raw_input = call.str("input");
-    let input = resolve::resolve(&call.base, &raw_input, "input").map_err(bad)?;
+    let double = call.bool("double_upscayl").map_err(bad)?;
+    let copy_metadata = call.bool("copy_metadata").map_err(bad)?;
+    let input = resolve::resolve(&call.base, raw_input, "input").map_err(bad)?;
     if !input.is_file() {
         return Err(bad(format!(
             "{}, and no file is there",
-            resolve::treatment(&call.base, &raw_input, "input")
+            resolve::treatment(&call.base, raw_input, "input")
         )));
     }
     let model_scale = call.int("model_scale", 0).map_err(bad)?;
@@ -285,13 +324,22 @@ fn run(call: &Call, ctx: &ModuleContext) -> Result<Value, (u16, String)> {
         model_scale as u32,
     )
     .map_err(bad)?;
-    let stem = input
-        .file_stem()
-        .and_then(|s| s.to_str())
-        .unwrap_or("image");
-    let auto = args::output_name(stem, &s.size, &model.name, &s.format);
-    let output =
-        output_path(&call.base, &input, &call.str("output"), &auto, &s.format).map_err(bad)?;
+    // A double run's name says the size it really produces: scale x scale.
+    let label_size = match (&s.size, double) {
+        (Size::Scale(x), true) => Size::Scale(x * x),
+        (other, _) => other.clone(),
+    };
+    let output = match output_override {
+        Some(o) => o,
+        None => {
+            let stem = input
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or("image");
+            let auto = args::output_name(stem, &label_size, &model.name, &s.format);
+            output_path(&call.base, &input, &call.str("output"), &auto, &s.format).map_err(bad)?
+        }
+    };
     if output.exists() && !s.overwrite {
         return Err((
             409,
@@ -300,6 +348,21 @@ fn run(call: &Call, ctx: &ModuleContext) -> Result<Value, (u16, String)> {
                 output.display()
             ),
         ));
+    }
+    if let (Some(limit), Ok(dim)) = (format_limit(&s.format), imagesize::size(&input)) {
+        let (w, h) = (dim.width as u64, dim.height as u64);
+        let (ow, oh) = match label_size {
+            Size::Scale(x) => (w * u64::from(x), h * u64::from(x)),
+            Size::Width(nw) => (u64::from(nw), h * u64::from(nw) / w.max(1)),
+            Size::Resize(nw, nh) => (u64::from(nw), u64::from(nh)),
+        };
+        if ow > limit || oh > limit {
+            return Err(bad(format!(
+                "the output would be {ow} x {oh} px, larger than {} allows ({limit} px a side). \
+                 Use a smaller scale, or format png",
+                s.format
+            )));
+        }
     }
     let exe = paths::engine_binary(ctx);
     if !exe.is_file() {
@@ -311,9 +374,19 @@ fn run(call: &Call, ctx: &ModuleContext) -> Result<Value, (u16, String)> {
             ),
         ));
     }
+    if copy_metadata && !ctx.module_path(paths::EXIFTOOL_REL).is_file() {
+        return Err((
+            503,
+            format!(
+                "copy_metadata needs exiftool, which is not staged ({} is missing). Run \
+                 scripts/sync-engine.ps1 without -SkipExiftool",
+                paths::EXIFTOOL_REL
+            ),
+        ));
+    }
     let plan = Plan {
-        input: input.clone(),
-        output: output.clone(),
+        input,
+        output,
         models_dir: model.dir.clone(),
         model_name: model.name.clone(),
         native_scale: model.native_scale,
@@ -326,12 +399,122 @@ fn run(call: &Call, ctx: &ModuleContext) -> Result<Value, (u16, String)> {
         threads: s.threads.clone(),
         tta: s.tta,
     };
-    let argv = args::engine_args(&plan);
-    let result = engine::run(&exe, &argv, &output, budget(), &|_| {});
-    let (ok, report, failure) = match result {
-        Ok(r) => (true, r, None),
-        Err((f, r)) => (false, r, Some(f)),
+    Ok(Prepared {
+        plan,
+        model,
+        double,
+        copy_metadata,
+        exe,
+    })
+}
+
+/// The two passes upstream runs for double upscayl: the first at the model's scale (or
+/// the requested scale) with no compression, width or TTA, into a lossless PNG; the
+/// second on that result with everything the caller asked for.
+pub fn passes(job: &Prepared, intermediate: &Path) -> Vec<Plan> {
+    if !job.double {
+        return vec![job.plan.clone()];
+    }
+    let first_scale = match job.plan.size {
+        Size::Scale(x) => x,
+        _ => job.plan.native_scale,
     };
+    let first = Plan {
+        output: intermediate.to_path_buf(),
+        size: Size::Scale(first_scale),
+        filter: None,
+        format: "png".into(),
+        compression: 0,
+        tta: false,
+        ..job.plan.clone()
+    };
+    let second = Plan {
+        input: intermediate.to_path_buf(),
+        ..job.plan.clone()
+    };
+    vec![first, second]
+}
+
+fn failure_message(f: Failure, output: &Path, tail: &[String]) -> (u16, String) {
+    match f {
+        Failure::Engine(e) => (500, format!("the engine refused: {e}")),
+        Failure::Budget(b) => (
+            504,
+            format!(
+                "stopped after {} s, this tool's limit for one call. Run long work with \
+                 start_job instead",
+                b.as_secs()
+            ),
+        ),
+        Failure::Spawn(e) => (500, e),
+        Failure::NoOutput => (
+            500,
+            format!(
+                "the engine finished without writing {}. Last lines: {}",
+                output.display(),
+                tail.join(" / ")
+            ),
+        ),
+    }
+}
+
+/// Run a prepared image to completion. `on_progress` gets 0 to 100 across all passes.
+pub fn execute(
+    job: &Prepared,
+    ctx: &ModuleContext,
+    budget: Duration,
+    on_progress: &dyn Fn(f32),
+) -> Result<Value, (u16, String)> {
+    let started = std::time::Instant::now();
+    let tmp_dir = ctx.data_path("tmp");
+    let intermediate = tmp_dir.join(format!(
+        "double-{}-{}.png",
+        std::process::id(),
+        NEXT_TMP.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+    ));
+    if job.double {
+        std::fs::create_dir_all(&tmp_dir)
+            .map_err(|e| (500, format!("cannot create {}: {e}", tmp_dir.display())))?;
+    }
+    let plans = passes(job, &intermediate);
+    let n = plans.len() as f32;
+    let mut argvs = Vec::new();
+    let mut outcome: Result<(), (u16, String)> = Ok(());
+    let mut last_exit = None;
+    let mut engine_ms: u128 = 0;
+    let mut last_progress = 0.0_f32;
+    for (i, plan) in plans.iter().enumerate() {
+        let argv = args::engine_args(plan);
+        argvs.push(argv.join(" "));
+        let remaining = budget.saturating_sub(started.elapsed());
+        let offset = i as f32;
+        let r = engine::run(&job.exe, &argv, &plan.output, remaining, &|p| {
+            on_progress((offset + p / 100.0) / n * 100.0)
+        });
+        match r {
+            Ok(rep) => {
+                last_exit = rep.exit_code;
+                engine_ms += rep.elapsed.as_millis();
+                last_progress = rep.progress;
+            }
+            Err((f, rep)) => {
+                last_exit = rep.exit_code;
+                engine_ms += rep.elapsed.as_millis();
+                last_progress = rep.progress;
+                outcome = Err(failure_message(f, &plan.output, &rep.stderr_tail));
+                break;
+            }
+        }
+    }
+    if job.double {
+        let _ = std::fs::remove_file(&intermediate);
+    }
+    if outcome.is_ok() && job.copy_metadata {
+        outcome = copy_metadata(ctx, &job.plan.input, &job.plan.output);
+    }
+    let ok = outcome.is_ok();
+    let input = &job.plan.input;
+    let output = &job.plan.output;
     ctx.log(
         if ok { "info" } else { "warning" },
         if ok {
@@ -343,48 +526,37 @@ fn run(call: &Call, ctx: &ModuleContext) -> Result<Value, (u16, String)> {
             "{} {} with {}",
             if ok { "upscaled" } else { "failed to upscale" },
             input.display(),
-            model.label
+            job.model.label
         ),
         &[
-            ("model".to_string(), model.label.as_str().into()),
-            ("license".to_string(), model.license.as_str().into()),
+            ("model".to_string(), job.model.label.as_str().into()),
+            ("license".to_string(), job.model.license.as_str().into()),
             ("input".to_string(), input.display().to_string().into()),
             ("output".to_string(), output.display().to_string().into()),
-            ("args".to_string(), argv.join(" ").into()),
+            ("args".to_string(), argvs.join(" && ").into()),
+            ("double".to_string(), job.double.into()),
+            ("copy_metadata".to_string(), job.copy_metadata.into()),
             (
                 "elapsed_ms".to_string(),
-                (report.elapsed.as_millis() as i64).into(),
+                (started.elapsed().as_millis() as i64).into(),
             ),
-            ("progress".to_string(), f64::from(report.progress).into()),
+            ("engine_ms".to_string(), (engine_ms as i64).into()),
+            ("progress".to_string(), f64::from(last_progress).into()),
             (
                 "exit_code".to_string(),
-                report.exit_code.map_or(Value::Null, |c| c.into()),
+                last_exit.map_or(Value::Null, |c| c.into()),
+            ),
+            (
+                "error".to_string(),
+                outcome
+                    .as_ref()
+                    .err()
+                    .map_or(Value::Null, |(_, m)| m.as_str().into()),
             ),
         ],
     );
-    if let Some(f) = failure {
-        return Err(match f {
-            Failure::Engine(e) => (500, format!("the engine refused: {e}")),
-            Failure::Budget(b) => (
-                504,
-                format!(
-                    "stopped after {} s, this tool's limit for one call. Run long work with \
-                     start_job instead",
-                    b.as_secs()
-                ),
-            ),
-            Failure::Spawn(e) => (500, e),
-            Failure::NoOutput => (
-                500,
-                format!(
-                    "the engine finished without writing {}. Last lines: {}",
-                    output.display(),
-                    report.stderr_tail.join(" / ")
-                ),
-            ),
-        });
-    }
-    let (w, h) = imagesize::size(&output)
+    outcome?;
+    let (w, h) = imagesize::size(output)
         .map(|d| (d.width as i64, d.height as i64))
         .map_err(|e| {
             (
@@ -396,9 +568,45 @@ fn run(call: &Call, ctx: &ModuleContext) -> Result<Value, (u16, String)> {
         .with("output", output.display().to_string().into())
         .with("width", w.into())
         .with("height", h.into())
-        .with("elapsed_ms", (report.elapsed.as_millis() as i64).into())
-        .with("model", model.label.as_str().into())
-        .with("license", model.license.as_str().into()))
+        .with("elapsed_ms", (started.elapsed().as_millis() as i64).into())
+        .with("model", job.model.label.as_str().into())
+        .with("license", job.model.license.as_str().into()))
+}
+
+/// Upstream's metadata copy: `exiftool -overwrite_original_in_place -tagsFromFile <in>
+/// <out>`. The output already exists when this runs, so a failure says so.
+fn copy_metadata(ctx: &ModuleContext, input: &Path, output: &Path) -> Result<(), (u16, String)> {
+    let exe = ctx.module_path(paths::EXIFTOOL_REL);
+    let mut cmd = std::process::Command::new(&exe);
+    cmd.arg("-overwrite_original_in_place")
+        .arg("-tagsFromFile")
+        .arg(input)
+        .arg(output)
+        .stdin(std::process::Stdio::null())
+        .env_remove("HDECK_MODULE_SECRET");
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(0x0800_0000);
+    }
+    let out = cmd.output().map_err(|e| {
+        (
+            500,
+            format!("could not start exiftool ({}): {e}", exe.display()),
+        )
+    })?;
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    if !out.status.success() || stderr.contains("Error") {
+        return Err((
+            500,
+            format!(
+                "upscaled to {}, but copying metadata failed: {}",
+                output.display(),
+                stderr.trim()
+            ),
+        ));
+    }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -486,6 +694,58 @@ mod tests {
         assert!(o.ends_with("out.jpeg"));
         let o = output_path(&b, &input, "outdir/", "x.png", "png").unwrap();
         assert!(o.ends_with("x.png"));
+    }
+
+    #[test]
+    fn double_runs_two_passes_and_only_the_second_gets_the_finishing_flags() {
+        let plan = Plan {
+            input: PathBuf::from("in.jpg"),
+            output: PathBuf::from("out.webp"),
+            models_dir: PathBuf::from("engine/models"),
+            model_name: "m-4x".into(),
+            native_scale: 4,
+            size: Size::Width(1000),
+            filter: Some("catmullrom".into()),
+            format: "webp".into(),
+            compression: 40,
+            gpu_id: None,
+            tile_size: None,
+            threads: None,
+            tta: true,
+        };
+        let model = models::Resolved {
+            dir: PathBuf::from("engine/models"),
+            name: "m-4x".into(),
+            native_scale: 4,
+            license: "x".into(),
+            label: "x".into(),
+        };
+        let job = Prepared {
+            plan,
+            model,
+            double: true,
+            copy_metadata: false,
+            exe: PathBuf::new(),
+        };
+        let p = passes(&job, Path::new("tmp.png"));
+        assert_eq!(p.len(), 2);
+        assert_eq!(p[0].size, Size::Scale(4));
+        assert_eq!(
+            (p[0].format.as_str(), p[0].compression, p[0].tta),
+            ("png", 0, false)
+        );
+        assert_eq!(p[0].output, PathBuf::from("tmp.png"));
+        assert_eq!(p[1].input, PathBuf::from("tmp.png"));
+        assert_eq!(p[1].size, Size::Width(1000));
+        assert_eq!(
+            (p[1].format.as_str(), p[1].compression, p[1].tta),
+            ("webp", 40, true)
+        );
+        let single = Prepared {
+            double: false,
+            ..job
+        };
+        assert_eq!(passes(&single, Path::new("tmp.png")).len(), 1);
     }
 
     /// End to end against the staged engine: skipped when the sync script has not run.
@@ -673,6 +933,105 @@ mod tests {
             let body = String::from_utf8_lossy(&r.body).to_string();
             assert_eq!(r.status, 500, "{body}");
             assert!(body.contains("Couldn't read the image"), "{body}");
+        }
+
+        #[test]
+        fn double_upscayl_multiplies_the_scale_and_names_it_honestly() {
+            let Some(ctx) = ctx() else { return };
+            let dir = out_dir("double");
+            let r = handle(
+                &post(
+                    serde_json::json!({"input": sample(), "output": format!("{}/", dir.display()), "model": "upscayl-lite-4x", "scale": 2, "double_upscayl": true}),
+                ),
+                &ctx,
+            );
+            assert_eq!(r.status, 200, "{}", String::from_utf8_lossy(&r.body));
+            let o = outputs(&r);
+            assert_eq!(o["width"].as_i64(), Some(1024));
+            assert!(o["output"]
+                .as_str()
+                .unwrap()
+                .ends_with("to_upscale_upscayl_4x_upscayl-lite-4x.png"));
+            let leftovers = std::fs::read_dir(ctx.data_path("tmp"))
+                .map(|d| d.count())
+                .unwrap_or(0);
+            assert_eq!(leftovers, 0, "the intermediate file was left behind");
+        }
+
+        #[test]
+        fn copy_metadata_carries_exif_to_the_output() {
+            let Some(ctx) = ctx() else { return };
+            let exiftool = ctx.module_path(paths::EXIFTOOL_REL);
+            if !exiftool.is_file() {
+                eprintln!("skipped: exiftool not staged");
+                return;
+            }
+            let dir = out_dir("meta");
+            let tagged = dir.join("tagged.jpg");
+            std::fs::copy(sample(), &tagged).unwrap();
+            let st = std::process::Command::new(&exiftool)
+                .args([
+                    "-overwrite_original",
+                    "-Artist=upscayl-hmod test",
+                    "-Copyright=CC0",
+                ])
+                .arg(&tagged)
+                .output()
+                .unwrap();
+            assert!(
+                st.status.success(),
+                "{}",
+                String::from_utf8_lossy(&st.stderr)
+            );
+            let out = dir.join("out.jpg");
+            let r = handle(
+                &post(
+                    serde_json::json!({"input": tagged.display().to_string(), "output": out.display().to_string(), "model": "upscayl-lite-4x", "format": "jpg", "copy_metadata": true}),
+                ),
+                &ctx,
+            );
+            assert_eq!(r.status, 200, "{}", String::from_utf8_lossy(&r.body));
+            let read = std::process::Command::new(&exiftool)
+                .args(["-s3", "-Artist"])
+                .arg(&out)
+                .output()
+                .unwrap();
+            assert_eq!(
+                String::from_utf8_lossy(&read.stdout).trim(),
+                "upscayl-hmod test"
+            );
+            // ...and without the flag, nothing is carried.
+            let plain = dir.join("plain.jpg");
+            let r = handle(
+                &post(
+                    serde_json::json!({"input": tagged.display().to_string(), "output": plain.display().to_string(), "model": "upscayl-lite-4x", "format": "jpg"}),
+                ),
+                &ctx,
+            );
+            assert_eq!(r.status, 200);
+            let read = std::process::Command::new(&exiftool)
+                .args(["-s3", "-Artist"])
+                .arg(&plain)
+                .output()
+                .unwrap();
+            assert_eq!(String::from_utf8_lossy(&read.stdout).trim(), "");
+        }
+
+        #[test]
+        fn an_output_too_large_for_webp_is_refused_before_running() {
+            let Some(ctx) = ctx() else { return };
+            let r = handle(
+                &post(
+                    serde_json::json!({"input": sample(), "model": "upscayl-lite-4x", "scale": 16, "double_upscayl": true, "format": "webp"}),
+                ),
+                &ctx,
+            );
+            let body = String::from_utf8_lossy(&r.body).to_string();
+            assert_eq!(r.status, 400, "{body}");
+            assert!(
+                body.contains("65536 x 65536") && body.contains("16383"),
+                "{body}"
+            );
         }
     }
 }

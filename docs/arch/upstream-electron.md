@@ -22,7 +22,7 @@ None that the module uses. The relevant seams, for porting:
 | Scale omission | sends `-s` only when it differs from the model's native scale and no custom width is set. **Never passes `-z`**, which is safe only for 4x models: a custom 2x/3x model is processed as 4x and comes out corrupted (`docs/results/engine-probe.md`, finding 1). The module does **not** port this rule |
 | Double upscayl | pass 1 without `-c`/`-w`/`-x`; pass 2 runs the output through again with them |
 | Copy metadata | after the run, `exiftool -tagsFromFile <in> -overwrite_original_in_place <out>` (via `exiftool-vendored`) |
-| Output naming | `<name>_upscayl_<scale>x_<model>.<fmt>` or `<width>px` when a custom width is used; `overwrite` setting |
+| Output naming | `<name>_upscayl_<scale>x_<model>.<fmt>` or `<width>px` when a custom width is used; `overwrite` setting. Double upscayl keeps the single-pass scale in the name (the module names it `scale x scale`) |
 | Progress / failure | parses stderr: `%` lines for progress, `Error`/`failed` for failure |
 | Custom models | a user-picked folder whose `.param`/`.bin` stems become model names |
 

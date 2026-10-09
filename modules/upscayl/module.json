@@ -206,6 +206,24 @@
           "label": "TTA"
         },
         {
+          "name": "double_upscayl",
+          "type": "bool",
+          "description": "Run the model twice, the second time on the first result, as Upscayl's Double Upscayl does. scale applies to each pass, so scale 4 gives 16x. Compression, width, resize and TTA apply to the second pass only.",
+          "widget": "bool",
+          "default": false,
+          "required": false,
+          "label": "double upscayl"
+        },
+        {
+          "name": "copy_metadata",
+          "type": "bool",
+          "description": "Copy the input's metadata (EXIF, IPTC, XMP) to the output with the bundled exiftool.",
+          "widget": "bool",
+          "default": false,
+          "required": false,
+          "label": "copy metadata"
+        },
+        {
           "name": "overwrite",
           "type": "bool",
           "description": "Replace the output if it already exists. Off: an existing output is refused.",

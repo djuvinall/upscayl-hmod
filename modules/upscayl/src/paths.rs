@@ -27,6 +27,9 @@ pub const ENGINE_REL: &str = "engine/bin/linux/upscayl-bin";
 /// `models`: the engine refuses any other folder name.
 pub const MODELS_REL: &str = "engine/models";
 
+/// The staged exiftool, for copy_metadata.
+pub const EXIFTOOL_REL: &str = "engine/exiftool/exiftool.exe";
+
 /// The staged engine binary for this platform. It exists only after the sync script ran.
 pub fn engine_binary(ctx: &ModuleContext) -> PathBuf {
     ctx.module_path(ENGINE_REL)

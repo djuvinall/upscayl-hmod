@@ -20,6 +20,8 @@ Inputs shared by the upscale tools (one socket per GUI setting and CLI flag): `i
 
 Argument rules, from `docs/results/engine-probe.md`: `-z` and `-s` are always sent; `width` and `resize` each replace `-s` and are mutually exclusive (a call setting both is refused); the output extension is derived from `format`; model files are checked before spawning; success is read from stderr, not the exit code.
 
+Built (#10): `double_upscayl` and `copy_metadata` sockets. Double runs pass 1 at the requested scale into a lossless PNG under the data dir's `tmp/` (removed afterwards) and pass 2 with compression, width/resize and TTA; a double run is named with the scale it really produces (`scale x scale`), where upstream names it with the single-pass scale. `copy_metadata` runs the staged exiftool (`-overwrite_original_in_place -tagsFromFile <in> <out>`). Outputs larger than the format allows (WebP 16383 px, JPEG 65535 px a side) are refused before running.
+
 Built (#9): `POST tools/upscale_image`. Outputs `output`, `width`, `height`, `elapsed_ms`, `model` (token or `.param` path), `license`. Refusals: 400 for a bad input (naming the socket), 409 for an existing output with `overwrite` off, 503 when the engine is not staged, 500 for an engine failure (its `Error:` sentence), 504 when the run passes the call budget (280 s, `UPSCAYL_TOOL_BUDGET_SECS`). One `upscayl.upscaled` / `upscayl.failed` event-log line per run with model, license and the full argv.
 
 Built (#5): `GET api/status` → `{version, platform, engine_staged, engine_path, licenses_present, data_dir}`, which the panel renders; `GET /module.json` read from the file; `--selfcheck` (the manifest's `verify`) checks `module.json`, `static/index.html` and `licenses/models.json` exist.
