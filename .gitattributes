@@ -1,0 +1,39 @@
+# Normalize line endings on commit. Without this, a repo edited on Windows and
+# checked out on Linux shows every file as modified, which makes `git status`
+# useless and hides real changes in the noise.
+* text=auto eol=lf
+
+# Shell scripts must be LF even on a Windows checkout -- CRLF in a shebang line
+# makes the interpreter path unresolvable and the script fails with a message
+# that names the wrong problem.
+*.sh text eol=lf
+
+# Git hooks have no extension, so *.sh misses them. Named explicitly so the pin
+# survives someone narrowing the baseline above.
+.githooks/* text eol=lf
+
+# Windows-native scripts stay CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary -- never normalize, never diff as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.zip binary
+*.woff binary
+*.woff2 binary
+
+# This fork's binaries: NCNN model weights, the engine, its DLLs, upstream's media,
+# and packed HollowDeck modules. `.bin` model weights are binary despite a generic
+# extension; `.param` model graphs are plain text and stay under the baseline.
+*.bin binary
+*.exe binary
+*.dll binary
+*.icns binary
+*.ico binary
+*.webp binary
+*.mp4 binary
+*.hmod binary
