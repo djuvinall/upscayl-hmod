@@ -194,7 +194,14 @@ pub fn run(
                 )
             })
             .collect();
-        let result = engine::run_directory(&probe.exe, &argv, budget, on_progress, should_stop);
+        let result = engine::run_directory(
+            &probe.exe,
+            &argv,
+            files.len(),
+            budget,
+            on_progress,
+            should_stop,
+        );
         let (report, killed) = match result {
             Ok(r) => (r, false),
             Err((Failure::Budget(_) | Failure::Cancelled, r)) => (r, true),
