@@ -64,9 +64,9 @@ pub fn stem_clashes(files: &[PathBuf]) -> Vec<String> {
 
 /// `POST tools/upscale_batch`.
 pub fn handle(req: &Request, ctx: &ModuleContext) -> Response {
-    let call = match Call::parse(req) {
+    let call = match Call::parse_for(req, ctx, "upscale_batch") {
         Ok(c) => c,
-        Err(e) => return Response::error(400, &e),
+        Err((s, e)) => return Response::error(s, &e),
     };
     match run(&call, ctx, upscale::budget(), &|_| {}, &|| false) {
         Ok(v) => Response::json(200, &Value::object().with("outputs", v)),

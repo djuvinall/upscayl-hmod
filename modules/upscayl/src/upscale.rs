@@ -42,6 +42,38 @@ impl Call {
         })
     }
 
+    /// [`Call::parse`], then fill every input the caller left out -- absent, null or
+    /// blank -- with the default `module.json` declares for `tool`. The core forwards
+    /// only what it was sent (graphs send every socket; a direct `/api/tools` call need
+    /// not), so the manifest stays the one place a default is written.
+    pub fn parse_for(
+        req: &Request,
+        ctx: &ModuleContext,
+        tool: &str,
+    ) -> Result<Call, (u16, String)> {
+        let mut call = Call::parse(req).map_err(|e| (400, e))?;
+        let defaults = declared_defaults(ctx, tool).map_err(|e| (500, e))?;
+        call.fill_defaults(&defaults);
+        Ok(call)
+    }
+
+    pub fn fill_defaults(&mut self, defaults: &serde_json::Map<String, Json>) {
+        if !self.inputs.is_object() {
+            self.inputs = Json::Object(serde_json::Map::new());
+        }
+        let inputs = self.inputs.as_object_mut().expect("inputs is an object");
+        for (k, d) in defaults {
+            let absent = match inputs.get(k) {
+                None | Some(Json::Null) => true,
+                Some(Json::String(s)) => s.trim().is_empty(),
+                _ => false,
+            };
+            if absent {
+                inputs.insert(k.clone(), d.clone());
+            }
+        }
+    }
+
     pub fn str(&self, k: &str) -> String {
         match &self.inputs[k] {
             Json::String(s) => s.trim().to_string(),
@@ -139,8 +171,9 @@ pub fn settings(call: &Call) -> Result<Settings, String> {
     } else {
         Size::Scale(scale as u32)
     };
+    // "default" is the engine's own choice, the same as passing no filter at all.
     let filter = match call.str("resize_filter").to_ascii_lowercase().as_str() {
-        "" => None,
+        "" | "default" => None,
         f if args::FILTERS.contains(&f) => Some(f.to_string()),
         f => {
             return Err(format!(
@@ -248,15 +281,36 @@ pub fn output_path(
     Ok(resolved)
 }
 
+/// The defaults `module.json` declares for `tool`'s inputs, by socket name.
+pub fn declared_defaults(
+    ctx: &ModuleContext,
+    tool: &str,
+) -> Result<serde_json::Map<String, Json>, String> {
+    let path = ctx.module_path("module.json");
+    let raw = std::fs::read(&path).map_err(|e| format!("cannot read {}: {e}", path.display()))?;
+    let manifest: Json =
+        serde_json::from_slice(&raw).map_err(|e| format!("{} is not JSON: {e}", path.display()))?;
+    let declared = manifest["tools"]
+        .as_array()
+        .and_then(|tools| tools.iter().find(|t| t["id"] == tool))
+        .ok_or_else(|| format!("module.json declares no tool \"{tool}\""))?;
+    Ok(declared["inputs"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|i| Some((i["name"].as_str()?.to_string(), i.get("default")?.clone())))
+        .collect())
+}
+
 /// A per-process counter for intermediate file names, so concurrent double runs never
 /// share one.
 static NEXT_TMP: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 
 /// `POST tools/upscale_image`.
 pub fn handle(req: &Request, ctx: &ModuleContext) -> Response {
-    let call = match Call::parse(req) {
+    let call = match Call::parse_for(req, ctx, "upscale_image") {
         Ok(c) => c,
-        Err(e) => return Response::error(400, &e),
+        Err((s, e)) => return Response::error(s, &e),
     };
     let job = match prepare(&call, ctx) {
         Ok(j) => j,
@@ -623,6 +677,70 @@ pub fn copy_metadata(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn manifest_ctx() -> ModuleContext {
+        let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        ModuleContext {
+            module_id: "upscayl".into(),
+            module_dir: dir.clone(),
+            mount_path: "/m/upscayl".into(),
+            shared_data_dir: dir.join("target/test-data"),
+            data_dir: dir.join("target/test-data/module_data/upscayl-defaults"),
+            core_version: None,
+            core_bind: "127.0.0.1".into(),
+            core_url: None,
+            secret: None,
+            port: 1,
+        }
+    }
+
+    #[test]
+    fn absent_null_and_blank_inputs_take_the_declared_default() {
+        let defaults = declared_defaults(&manifest_ctx(), "upscale_image").unwrap();
+        assert_eq!(defaults["model"], "upscayl-standard-4x");
+        let mut c = call(serde_json::json!({
+            "input": "a.png", "format": null, "tile_size": "  ", "scale": 2, "model": "upscayl-lite-4x"
+        }));
+        c.fill_defaults(&defaults);
+        assert_eq!(c.str("input"), "a.png");
+        assert_eq!(c.str("model"), "upscayl-lite-4x", "a given value is kept");
+        assert_eq!(c.int("scale", 0).unwrap(), 2);
+        assert_eq!(c.str("format"), "png", "null takes the default");
+        assert_eq!(c.str("tile_size"), "0", "blank takes the default");
+        assert!(!c.bool("tta").unwrap(), "absent takes the default");
+
+        let mut empty = call(serde_json::json!(null));
+        empty.fill_defaults(&defaults);
+        assert_eq!(empty.str("model"), "upscayl-standard-4x");
+    }
+
+    #[test]
+    fn every_tool_reads_its_defaults_and_they_agree_with_the_code() {
+        let ctx = manifest_ctx();
+        for tool in [
+            "upscale_image",
+            "upscale_batch",
+            "import_model",
+            "list_models",
+            "start_job",
+            "job_status",
+            "wait_job",
+            "cancel_job",
+        ] {
+            declared_defaults(&ctx, tool).unwrap_or_else(|e| panic!("{tool}: {e}"));
+        }
+        assert!(declared_defaults(&ctx, "no_such_tool").is_err());
+        // The code's own fallbacks and the manifest's defaults must mean the same run.
+        for tool in ["upscale_image", "upscale_batch", "start_job"] {
+            let mut filled = call(serde_json::json!({}));
+            filled.fill_defaults(&declared_defaults(&ctx, tool).unwrap());
+            assert_eq!(
+                settings(&filled).unwrap(),
+                settings(&call(serde_json::json!({}))).unwrap(),
+                "{tool}"
+            );
+        }
+    }
 
     fn call(inputs: serde_json::Value) -> Call {
         Call {
