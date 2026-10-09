@@ -1,0 +1,18 @@
+run        20261009-043541-7557d5
+graph      <repo>\modules\upscayl\examples\04-double-upscayl.json
+status     finished
+took       3549 ms
+attended   yes (--attended): every node on the graph may run
+folder     <repo>\.scratch\hd-data\runs\20261009-043541-7557d5
+calls      upscayl/upscale_image
+project    <repo>\modules\upscayl\examples\upscayl-examples.hollow
+output     <repo>\.scratch\hd-data\module_data\scheduler\output/20261009-043541-7557d5.json
+           [upscale_image_1:upscayl/upscale_image] calling the upscayl module
+           [sink_10:sink] 1.output = '<repo>\\modules\\upscayl\\examples\\out\\04\\sample_upscayl_4x_upscayl-lite-4x.png'
+           [sink_11:sink] 1.width = 1024
+           [sink_12:sink] 1.height = 1024
+action     #1 step 1  upscale_image_1 (upscayl/upscale_image)  finished  2687.044 ms
+action     #2 step 2  sink_10 (core/sink)  finished  0.018 ms
+action     #3 step 2  sink_11 (core/sink)  finished  0.013 ms
+action     #4 step 2  sink_12 (core/sink)  finished  0.011 ms
+result     upscale_image_1__output='<repo>\\modules\\upscayl\\examples\\out\\04\\sample_upscayl_4x_upscayl-lite-4x.png', upscale_image_1__width=1024, upscale_image_1__height=1024, upscale_image_1__elapsed_ms=2124, upscale_image_1__model='upscayl:bundled/upscayl-lite-4x', upscale_image_1__license='BSD-3-Clause'

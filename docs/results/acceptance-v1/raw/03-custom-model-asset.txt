@@ -1,0 +1,20 @@
+run        20261009-043536-51cd11
+graph      <repo>\modules\upscayl\examples\03-custom-model-asset.json
+status     finished
+took       4425 ms
+attended   yes (--attended): every node on the graph may run
+folder     <repo>\.scratch\hd-data\runs\20261009-043536-51cd11
+calls      upscayl/upscale_image
+project    <repo>\modules\upscayl\examples\upscayl-examples.hollow
+output     <repo>\.scratch\hd-data\module_data\scheduler\output/20261009-043536-51cd11.json
+           asset/reference: upscayl:bundled-remacri-4x -> model = 'upscayl:bundled/remacri-4x'
+           [upscale_image_2:upscayl/upscale_image] calling the upscayl module
+           [sink_10:sink] 2.output = '<repo>\\modules\\upscayl\\examples\\out\\03\\sample_upscayl_2x_remacri-4x.png'
+           [sink_11:sink] 2.model = 'upscayl:bundled/remacri-4x'
+           [sink_12:sink] 2.license = 'CC-BY-NC-SA-4.0'
+action     #1 step 1  reference_1 (asset/reference)  finished  0.033 ms
+action     #2 step 2  upscale_image_2 (upscayl/upscale_image)  finished  3546.668 ms
+action     #3 step 3  sink_10 (core/sink)  finished  0.017 ms
+action     #4 step 3  sink_11 (core/sink)  finished  0.009 ms
+action     #5 step 3  sink_12 (core/sink)  finished  0.011 ms
+result     reference_1__value='upscayl:bundled/remacri-4x', upscale_image_2__output='<repo>\\modules\\upscayl\\examples\\out\\03\\sample_upscayl_2x_remacri-4x.png', upscale_image_2__width=512, upscale_image_2__height=512, upscale_image_2__elapsed_ms=2971, upscale_image_2__model='upscayl:bundled/remacri-4x', upscale_image_2__license='CC-BY-NC-SA-4.0'

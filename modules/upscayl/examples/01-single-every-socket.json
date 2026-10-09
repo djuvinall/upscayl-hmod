@@ -1,0 +1,380 @@
+{
+  "name": "upscayl 01: one image, every socket set",
+  "description": "Three upscale_image nodes: scale with every flag set (gpu, tile, threads, TTA, WebP compression), width with a filter, exact resize with a filter.",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "upscayl/upscale_image",
+      "title": "Scale 3x, WebP, TTA",
+      "values": {
+        "input": "samples/sample.png",
+        "output": "out/01/",
+        "model": "high-fidelity-4x",
+        "custom_model": "",
+        "model_scale": 4,
+        "scale": 3,
+        "width": 0,
+        "resize": "",
+        "resize_filter": "default",
+        "format": "webp",
+        "compression": 30,
+        "gpu_id": "0",
+        "tile_size": "0",
+        "threads": "1:2:2",
+        "tta": true,
+        "double_upscayl": false,
+        "copy_metadata": false,
+        "overwrite": true
+      },
+      "pos": [
+        40,
+        60
+      ]
+    },
+    {
+      "id": "2",
+      "type": "upscayl/upscale_image",
+      "title": "Width 900, catmullrom, JPEG",
+      "values": {
+        "input": "samples/sample.png",
+        "output": "out/01/",
+        "model": "upscayl-lite-4x",
+        "custom_model": "",
+        "model_scale": 4,
+        "scale": 4,
+        "width": 900,
+        "resize": "",
+        "resize_filter": "catmullrom",
+        "format": "jpg",
+        "compression": 0,
+        "gpu_id": "0",
+        "tile_size": "0",
+        "threads": "1:2:2",
+        "tta": false,
+        "double_upscayl": false,
+        "copy_metadata": false,
+        "overwrite": true
+      },
+      "pos": [
+        40,
+        360
+      ]
+    },
+    {
+      "id": "3",
+      "type": "upscayl/upscale_image",
+      "title": "Exact 640x360, mitchell",
+      "values": {
+        "input": "samples/sample.png",
+        "output": "out/01/",
+        "model": "digital-art-4x",
+        "custom_model": "",
+        "model_scale": 4,
+        "scale": 4,
+        "width": 0,
+        "resize": "640x360",
+        "resize_filter": "mitchell",
+        "format": "png",
+        "compression": 0,
+        "gpu_id": "0",
+        "tile_size": "0",
+        "threads": "1:2:2",
+        "tta": false,
+        "double_upscayl": false,
+        "copy_metadata": false,
+        "overwrite": true
+      },
+      "pos": [
+        40,
+        660
+      ]
+    },
+    {
+      "id": "10",
+      "type": "core/sink",
+      "title": "1.output",
+      "values": {
+        "label": "1.output"
+      },
+      "pos": [
+        460,
+        60
+      ]
+    },
+    {
+      "id": "11",
+      "type": "core/sink",
+      "title": "1.width",
+      "values": {
+        "label": "1.width"
+      },
+      "pos": [
+        460,
+        130
+      ]
+    },
+    {
+      "id": "12",
+      "type": "core/sink",
+      "title": "1.height",
+      "values": {
+        "label": "1.height"
+      },
+      "pos": [
+        460,
+        200
+      ]
+    },
+    {
+      "id": "13",
+      "type": "core/sink",
+      "title": "1.model",
+      "values": {
+        "label": "1.model"
+      },
+      "pos": [
+        460,
+        270
+      ]
+    },
+    {
+      "id": "14",
+      "type": "core/sink",
+      "title": "1.license",
+      "values": {
+        "label": "1.license"
+      },
+      "pos": [
+        460,
+        340
+      ]
+    },
+    {
+      "id": "15",
+      "type": "core/sink",
+      "title": "2.output",
+      "values": {
+        "label": "2.output"
+      },
+      "pos": [
+        460,
+        360
+      ]
+    },
+    {
+      "id": "16",
+      "type": "core/sink",
+      "title": "2.width",
+      "values": {
+        "label": "2.width"
+      },
+      "pos": [
+        460,
+        430
+      ]
+    },
+    {
+      "id": "17",
+      "type": "core/sink",
+      "title": "2.height",
+      "values": {
+        "label": "2.height"
+      },
+      "pos": [
+        460,
+        500
+      ]
+    },
+    {
+      "id": "18",
+      "type": "core/sink",
+      "title": "2.model",
+      "values": {
+        "label": "2.model"
+      },
+      "pos": [
+        460,
+        570
+      ]
+    },
+    {
+      "id": "19",
+      "type": "core/sink",
+      "title": "2.license",
+      "values": {
+        "label": "2.license"
+      },
+      "pos": [
+        460,
+        640
+      ]
+    },
+    {
+      "id": "20",
+      "type": "core/sink",
+      "title": "3.output",
+      "values": {
+        "label": "3.output"
+      },
+      "pos": [
+        460,
+        660
+      ]
+    },
+    {
+      "id": "21",
+      "type": "core/sink",
+      "title": "3.width",
+      "values": {
+        "label": "3.width"
+      },
+      "pos": [
+        460,
+        730
+      ]
+    },
+    {
+      "id": "22",
+      "type": "core/sink",
+      "title": "3.height",
+      "values": {
+        "label": "3.height"
+      },
+      "pos": [
+        460,
+        800
+      ]
+    },
+    {
+      "id": "23",
+      "type": "core/sink",
+      "title": "3.model",
+      "values": {
+        "label": "3.model"
+      },
+      "pos": [
+        460,
+        870
+      ]
+    },
+    {
+      "id": "24",
+      "type": "core/sink",
+      "title": "3.license",
+      "values": {
+        "label": "3.license"
+      },
+      "pos": [
+        460,
+        940
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "1",
+      "from_node": "1",
+      "from_socket": "output",
+      "to_node": "10",
+      "to_socket": "value"
+    },
+    {
+      "id": "2",
+      "from_node": "1",
+      "from_socket": "width",
+      "to_node": "11",
+      "to_socket": "value"
+    },
+    {
+      "id": "3",
+      "from_node": "1",
+      "from_socket": "height",
+      "to_node": "12",
+      "to_socket": "value"
+    },
+    {
+      "id": "4",
+      "from_node": "1",
+      "from_socket": "model",
+      "to_node": "13",
+      "to_socket": "value"
+    },
+    {
+      "id": "5",
+      "from_node": "1",
+      "from_socket": "license",
+      "to_node": "14",
+      "to_socket": "value"
+    },
+    {
+      "id": "6",
+      "from_node": "2",
+      "from_socket": "output",
+      "to_node": "15",
+      "to_socket": "value"
+    },
+    {
+      "id": "7",
+      "from_node": "2",
+      "from_socket": "width",
+      "to_node": "16",
+      "to_socket": "value"
+    },
+    {
+      "id": "8",
+      "from_node": "2",
+      "from_socket": "height",
+      "to_node": "17",
+      "to_socket": "value"
+    },
+    {
+      "id": "9",
+      "from_node": "2",
+      "from_socket": "model",
+      "to_node": "18",
+      "to_socket": "value"
+    },
+    {
+      "id": "10",
+      "from_node": "2",
+      "from_socket": "license",
+      "to_node": "19",
+      "to_socket": "value"
+    },
+    {
+      "id": "11",
+      "from_node": "3",
+      "from_socket": "output",
+      "to_node": "20",
+      "to_socket": "value"
+    },
+    {
+      "id": "12",
+      "from_node": "3",
+      "from_socket": "width",
+      "to_node": "21",
+      "to_socket": "value"
+    },
+    {
+      "id": "13",
+      "from_node": "3",
+      "from_socket": "height",
+      "to_node": "22",
+      "to_socket": "value"
+    },
+    {
+      "id": "14",
+      "from_node": "3",
+      "from_socket": "model",
+      "to_node": "23",
+      "to_socket": "value"
+    },
+    {
+      "id": "15",
+      "from_node": "3",
+      "from_socket": "license",
+      "to_node": "24",
+      "to_socket": "value"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+run        20261009-043546-b0545a
+graph      <repo>\modules\upscayl\examples\05-copy-metadata.json
+status     finished
+took       4790 ms
+attended   yes (--attended): every node on the graph may run
+folder     <repo>\.scratch\hd-data\runs\20261009-043546-b0545a
+calls      upscayl/upscale_image
+project    <repo>\modules\upscayl\examples\upscayl-examples.hollow
+output     <repo>\.scratch\hd-data\module_data\scheduler\output/20261009-043546-b0545a.json
+           [upscale_image_1:upscayl/upscale_image] calling the upscayl module
+           [sink_10:sink] 1.output = '<repo>\\modules\\upscayl\\examples\\out\\05\\tagged_upscayl_2x_upscayl-lite-4x.jpg'
+           [sink_11:sink] 1.width = 512
+action     #1 step 1  upscale_image_1 (upscayl/upscale_image)  finished  3905.111 ms
+action     #2 step 2  sink_10 (core/sink)  finished  0.019 ms
+action     #3 step 2  sink_11 (core/sink)  finished  0.018 ms
+result     upscale_image_1__output='<repo>\\modules\\upscayl\\examples\\out\\05\\tagged_upscayl_2x_upscayl-lite-4x.jpg', upscale_image_1__width=512, upscale_image_1__height=512, upscale_image_1__elapsed_ms=3322, upscale_image_1__model='upscayl:bundled/upscayl-lite-4x', upscale_image_1__license='BSD-3-Clause'

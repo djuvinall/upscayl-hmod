@@ -1,0 +1,44 @@
+{
+  "name": "upscayl 08: unattended, box off",
+  "description": "Run with plain `hollowdeck run` (unattended). Refused before the call: the box is off and upscale_image declares effects writes.",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "upscayl/upscale_image",
+      "title": "Upscale (unattended box off)",
+      "values": {
+        "input": "samples/sample.png",
+        "output": "out/08/",
+        "model": "upscayl-lite-4x",
+        "scale": 2,
+        "overwrite": true,
+        "allow_unattended": false
+      },
+      "pos": [
+        40,
+        200
+      ]
+    },
+    {
+      "id": "10",
+      "type": "core/sink",
+      "title": "1.output",
+      "values": {
+        "label": "1.output"
+      },
+      "pos": [
+        420,
+        80
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "1",
+      "from_node": "1",
+      "from_socket": "output",
+      "to_node": "10",
+      "to_socket": "value"
+    }
+  ]
+}

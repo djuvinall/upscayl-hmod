@@ -1,0 +1,46 @@
+run        20261009-043524-ba7055
+graph      <repo>\modules\upscayl\examples\01-single-every-socket.json
+status     finished
+took       6469 ms
+attended   yes (--attended): every node on the graph may run
+folder     <repo>\.scratch\hd-data\runs\20261009-043524-ba7055
+calls      upscayl/upscale_image
+project    <repo>\modules\upscayl\examples\upscayl-examples.hollow
+output     <repo>\.scratch\hd-data\module_data\scheduler\output/20261009-043524-ba7055.json
+           [upscale_image_1:upscayl/upscale_image] calling the upscayl module
+           [upscale_image_2:upscayl/upscale_image] calling the upscayl module
+           [upscale_image_3:upscayl/upscale_image] calling the upscayl module
+           [sink_10:sink] 1.output = '<repo>\\modules\\upscayl\\examples\\out\\01\\sample_upscayl_3x_high-fidelity-4x.webp'
+           [sink_11:sink] 1.width = 768
+           [sink_12:sink] 1.height = 768
+           [sink_13:sink] 1.model = 'upscayl:bundled/high-fidelity-4x'
+           [sink_14:sink] 1.license = 'CC-BY-4.0'
+           [sink_15:sink] 2.output = '<repo>\\modules\\upscayl\\examples\\out\\01\\sample_upscayl_900px_upscayl-lite-4x.jpg'
+           [sink_16:sink] 2.width = 900
+           [sink_17:sink] 2.height = 900
+           [sink_18:sink] 2.model = 'upscayl:bundled/upscayl-lite-4x'
+           [sink_19:sink] 2.license = 'BSD-3-Clause'
+           [sink_20:sink] 3.output = '<repo>\\modules\\upscayl\\examples\\out\\01\\sample_upscayl_640x360_digital-art-4x.png'
+           [sink_21:sink] 3.width = 640
+           [sink_22:sink] 3.height = 360
+           [sink_23:sink] 3.model = 'upscayl:bundled/digital-art-4x'
+           [sink_24:sink] 3.license = 'BSD-3-Clause'
+action     #1 step 1  upscale_image_1 (upscayl/upscale_image)  finished  5618.452 ms
+action     #2 step 1  upscale_image_2 (upscayl/upscale_image)  finished  2239.124 ms
+action     #3 step 1  upscale_image_3 (upscayl/upscale_image)  finished  2813.705 ms
+action     #4 step 2  sink_10 (core/sink)  finished  0.027 ms
+action     #5 step 2  sink_11 (core/sink)  finished  0.013 ms
+action     #6 step 2  sink_12 (core/sink)  finished  0.009 ms
+action     #7 step 2  sink_13 (core/sink)  finished  0.013 ms
+action     #8 step 2  sink_14 (core/sink)  finished  0.013 ms
+action     #9 step 2  sink_15 (core/sink)  finished  0.011 ms
+action     #10 step 2  sink_16 (core/sink)  finished  0.01 ms
+action     #11 step 2  sink_17 (core/sink)  finished  0.01 ms
+action     #12 step 2  sink_18 (core/sink)  finished  0.01 ms
+action     #13 step 2  sink_19 (core/sink)  finished  0.01 ms
+action     #14 step 2  sink_20 (core/sink)  finished  0.01 ms
+action     #15 step 2  sink_21 (core/sink)  finished  0.01 ms
+action     #16 step 2  sink_22 (core/sink)  finished  0.009 ms
+action     #17 step 2  sink_23 (core/sink)  finished  0.01 ms
+action     #18 step 2  sink_24 (core/sink)  finished  0.009 ms
+result     upscale_image_1__output='<repo>\\modules\\upscayl\\examples\\out\\01\\sample_upscayl_3x_high-fidelity-4x.webp', upscale_image_1__width=768, upscale_image_1__height=768, upscale_image_1__elapsed_ms=5024, upscale_image_1__model='upscayl:bundled/high-fidelity-4x', upscale_image_1__license='CC-BY-4.0', upscale_image_2__output='<repo>\\module...

@@ -1,0 +1,10 @@
+run        20261009-044233-dfffad
+graph      <repo>\modules\upscayl\examples\08-unattended-box-off.json
+status     failed
+took       172 ms
+attended   no: a tool node runs only with 'Allow in unattended runs' ticked
+folder     <repo>\.scratch\hd-data\runs\20261009-044233-dfffad
+project    <repo>\modules\upscayl\examples\upscayl-examples.hollow
+output     <repo>\.scratch\hd-data\module_data\scheduler\output/20261009-044233-dfffad.json
+           [tool] upscayl/upscale_image node 'upscale_image_1' writes to this machine, and its 'Allow in unattended runs' box is not ticked, so an unattended run will not run it. Tick the box on the node to let it run with nobody watching, or run the graph attended -- from the editor, or with `hollowdeck run --attended`.
+error      error: upscayl/upscale_image node 'upscale_image_1' writes to this machine, and its 'Allow in unattended runs' box is not ticked, so an unattended run will not run it. Tick the box on the node to let it run with nobody watching, or run the graph attended -- from the editor, or with `hollowdeck run --attended`. (node 1)

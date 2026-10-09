@@ -1,0 +1,262 @@
+[
+    {
+        "graph":  "01-single-every-socket.json",
+        "command":  "hollowdeck --project modules/upscayl/examples/upscayl-examples.hollow run modules/upscayl/examples/01-single-every-socket.json --attended",
+        "exit_code":  0,
+        "seconds":  7.7,
+        "status":  "finished",
+        "error":  "",
+        "refused":  [
+
+                    ],
+        "summary":  "upscale_image_1__output=\u0027\u003crepo\u003e\\\\modules\\\\upscayl\\\\examples\\\\out\\\\01\\\\sample_upscayl_3x_high-fidelity-4x.webp\u0027, upscale_image_1__width=768, upscale_image_1__height=768, upscale_image_1__elapsed_ms=5024, upscale_image_1__model=\u0027upscayl:bundled/high-fidelity-4x\u0027, upscale_image_1__license=\u0027CC-BY-4.0\u0027, upscale_image_2__output=\u0027\u003crepo\u003e\\\\module...",
+        "events":  [
+                       {
+                           "event":  "upscayl.started",
+                           "message":  "the Upscayl module is coming up",
+                           "model":  null,
+                           "license":  null,
+                           "args":  ""
+                       },
+                       {
+                           "event":  "upscayl.upscaled",
+                           "message":  "upscaled \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png with upscayl:bundled/upscayl-lite-4x",
+                           "model":  "upscayl:bundled/upscayl-lite-4x",
+                           "license":  "BSD-3-Clause",
+                           "args":  "-i \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png -o \u003crepo\u003e\\modules\\upscayl\\examples\\out\\01\\sample_upscayl_900px_upscayl-lite-4x.jpg -m \u003crepo\u003e\\modules\\upscayl\\engine\\models -n upscayl-lite-4x -z 4 -w 900:catmullrom -f jpg -c 0 -g 0 -j 1:2:2"
+                       },
+                       {
+                           "event":  "upscayl.upscaled",
+                           "message":  "upscaled \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png with upscayl:bundled/digital-art-4x",
+                           "model":  "upscayl:bundled/digital-art-4x",
+                           "license":  "BSD-3-Clause",
+                           "args":  "-i \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png -o \u003crepo\u003e\\modules\\upscayl\\examples\\out\\01\\sample_upscayl_640x360_digital-art-4x.png -m \u003crepo\u003e\\modules\\upscayl\\engine\\models -n digital-art-4x -z 4 -r 640x360:mitchell -f png -c 0 -g 0 -j 1:2:2"
+                       },
+                       {
+                           "event":  "upscayl.upscaled",
+                           "message":  "upscaled \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png with upscayl:bundled/high-fidelity-4x",
+                           "model":  "upscayl:bundled/high-fidelity-4x",
+                           "license":  "CC-BY-4.0",
+                           "args":  "-i \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png -o \u003crepo\u003e\\modules\\upscayl\\examples\\out\\01\\sample_upscayl_3x_high-fidelity-4x.webp -m \u003crepo\u003e\\modules\\upscayl\\engine\\models -n high-fidelity-4x -z 4 -s 3 -f webp -c 30 -g 0 -j 1:2:2 -x"
+                       }
+                   ]
+    },
+    {
+        "graph":  "02-custom-model-param.json",
+        "command":  "hollowdeck --project modules/upscayl/examples/upscayl-examples.hollow run modules/upscayl/examples/02-custom-model-param.json --attended",
+        "exit_code":  0,
+        "seconds":  3.8,
+        "status":  "finished",
+        "error":  "",
+        "refused":  [
+
+                    ],
+        "summary":  "upscale_image_1__output=\u0027\u003crepo\u003e\\\\modules\\\\upscayl\\\\examples\\\\out\\\\02\\\\sample_upscayl_2x_upscayl-lite-4x.png\u0027, upscale_image_1__width=512, upscale_image_1__height=512, upscale_image_1__elapsed_ms=1010, upscale_image_1__model=\u0027\u003crepo\u003e\\\\modules\\\\upscayl\\\\engine\\\\models\\\\upscayl-lite-4x.param\u0027, upscale_image_1__license=\u0027unrecorded\u0027",
+        "events":  [
+                       {
+                           "event":  "upscayl.started",
+                           "message":  "the Upscayl module is coming up",
+                           "model":  null,
+                           "license":  null,
+                           "args":  ""
+                       },
+                       {
+                           "event":  "upscayl.upscaled",
+                           "message":  "upscaled \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png with \u003crepo\u003e\\modules\\upscayl\\engine\\models\\upscayl-lite-4x.param",
+                           "model":  "<repo>\\modules\\upscayl\\engine\\models\\upscayl-lite-4x.param",
+                           "license":  "unrecorded",
+                           "args":  "-i \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png -o \u003crepo\u003e\\modules\\upscayl\\examples\\out\\02\\sample_upscayl_2x_upscayl-lite-4x.png -m \u003crepo\u003e\\modules\\upscayl\\engine\\models -n upscayl-lite-4x -z 4 -s 2 -f png -c 0"
+                       }
+                   ]
+    },
+    {
+        "graph":  "03-custom-model-asset.json",
+        "command":  "hollowdeck --project modules/upscayl/examples/upscayl-examples.hollow run modules/upscayl/examples/03-custom-model-asset.json --attended",
+        "exit_code":  0,
+        "seconds":  5.7,
+        "status":  "finished",
+        "error":  "",
+        "refused":  [
+
+                    ],
+        "summary":  "reference_1__value=\u0027upscayl:bundled/remacri-4x\u0027, upscale_image_2__output=\u0027\u003crepo\u003e\\\\modules\\\\upscayl\\\\examples\\\\out\\\\03\\\\sample_upscayl_2x_remacri-4x.png\u0027, upscale_image_2__width=512, upscale_image_2__height=512, upscale_image_2__elapsed_ms=2971, upscale_image_2__model=\u0027upscayl:bundled/remacri-4x\u0027, upscale_image_2__license=\u0027CC-BY-NC-SA-4.0\u0027",
+        "events":  [
+                       {
+                           "event":  "upscayl.started",
+                           "message":  "the Upscayl module is coming up",
+                           "model":  null,
+                           "license":  null,
+                           "args":  ""
+                       },
+                       {
+                           "event":  "upscayl.upscaled",
+                           "message":  "upscaled \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png with upscayl:bundled/remacri-4x",
+                           "model":  "upscayl:bundled/remacri-4x",
+                           "license":  "CC-BY-NC-SA-4.0",
+                           "args":  "-i \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png -o \u003crepo\u003e\\modules\\upscayl\\examples\\out\\03\\sample_upscayl_2x_remacri-4x.png -m \u003crepo\u003e\\modules\\upscayl\\engine\\models -n remacri-4x -z 4 -s 2 -f png -c 0"
+                       }
+                   ]
+    },
+    {
+        "graph":  "04-double-upscayl.json",
+        "command":  "hollowdeck --project modules/upscayl/examples/upscayl-examples.hollow run modules/upscayl/examples/04-double-upscayl.json --attended",
+        "exit_code":  0,
+        "seconds":  4.8,
+        "status":  "finished",
+        "error":  "",
+        "refused":  [
+
+                    ],
+        "summary":  "upscale_image_1__output=\u0027\u003crepo\u003e\\\\modules\\\\upscayl\\\\examples\\\\out\\\\04\\\\sample_upscayl_4x_upscayl-lite-4x.png\u0027, upscale_image_1__width=1024, upscale_image_1__height=1024, upscale_image_1__elapsed_ms=2124, upscale_image_1__model=\u0027upscayl:bundled/upscayl-lite-4x\u0027, upscale_image_1__license=\u0027BSD-3-Clause\u0027",
+        "events":  [
+                       {
+                           "event":  "upscayl.started",
+                           "message":  "the Upscayl module is coming up",
+                           "model":  null,
+                           "license":  null,
+                           "args":  ""
+                       },
+                       {
+                           "event":  "upscayl.upscaled",
+                           "message":  "upscaled \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png with upscayl:bundled/upscayl-lite-4x",
+                           "model":  "upscayl:bundled/upscayl-lite-4x",
+                           "license":  "BSD-3-Clause",
+                           "args":  "-i \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png -o \u003crepo\u003e\\.scratch\\hd-data\\module_data\\upscayl\\tmp\\double-2189196-0.png -m \u003crepo\u003e\\modules\\upscayl\\engine\\models -n upscayl-lite-4x -z 4 -s 2 -f png -c 0 \u0026\u0026 -i \u003crepo\u003e\\.scratch\\hd-data\\module_data\\upscayl\\tmp\\double-2189196-0.png -o \u003crepo\u003e\\modules\\upscayl\\examples\\out\\04\\sample_upscayl_4x_upscayl-lite-4x.png -m \u003crepo\u003e\\modules\\upscayl\\engine\\models -n upscayl-lite-4x -z 4 -s 2 -f png -c 0"
+                       }
+                   ]
+    },
+    {
+        "graph":  "05-copy-metadata.json",
+        "command":  "hollowdeck --project modules/upscayl/examples/upscayl-examples.hollow run modules/upscayl/examples/05-copy-metadata.json --attended",
+        "exit_code":  0,
+        "seconds":  6,
+        "status":  "finished",
+        "error":  "",
+        "refused":  [
+
+                    ],
+        "summary":  "upscale_image_1__output=\u0027\u003crepo\u003e\\\\modules\\\\upscayl\\\\examples\\\\out\\\\05\\\\tagged_upscayl_2x_upscayl-lite-4x.jpg\u0027, upscale_image_1__width=512, upscale_image_1__height=512, upscale_image_1__elapsed_ms=3322, upscale_image_1__model=\u0027upscayl:bundled/upscayl-lite-4x\u0027, upscale_image_1__license=\u0027BSD-3-Clause\u0027",
+        "events":  [
+                       {
+                           "event":  "upscayl.started",
+                           "message":  "the Upscayl module is coming up",
+                           "model":  null,
+                           "license":  null,
+                           "args":  ""
+                       },
+                       {
+                           "event":  "upscayl.upscaled",
+                           "message":  "upscaled \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\tagged.jpg with upscayl:bundled/upscayl-lite-4x",
+                           "model":  "upscayl:bundled/upscayl-lite-4x",
+                           "license":  "BSD-3-Clause",
+                           "args":  "-i \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\tagged.jpg -o \u003crepo\u003e\\modules\\upscayl\\examples\\out\\05\\tagged_upscayl_2x_upscayl-lite-4x.jpg -m \u003crepo\u003e\\modules\\upscayl\\engine\\models -n upscayl-lite-4x -z 4 -s 2 -f jpg -c 0"
+                       }
+                   ]
+    },
+    {
+        "graph":  "06-batch-corrupt.json",
+        "command":  "hollowdeck --project modules/upscayl/examples/upscayl-examples.hollow run modules/upscayl/examples/06-batch-corrupt.json --attended",
+        "exit_code":  0,
+        "seconds":  3.6,
+        "status":  "finished",
+        "error":  "",
+        "refused":  [
+
+                    ],
+        "summary":  "upscale_batch_1__output_folder=\u0027\u003crepo\u003e\\\\modules\\\\upscayl\\\\examples\\\\out\\\\06\\\\upscayl_png_upscayl-lite-4x_2x\u0027, upscale_batch_1__outputs=[\u0027\u003crepo\u003e\\\\modules\\\\upscayl\\\\examples\\\\out\\\\06\\\\upscayl_png_upscayl-lite-4x_2x\\\\a.png\u0027, \u0027\u003crepo\u003e\\\\modules\\\\upscayl\\\\examples\\\\out\\\\06\\\\upscayl_png_upscayl-lite-4x_2x\\\\b.png\u0027], u...",
+        "events":  [
+                       {
+                           "event":  "upscayl.started",
+                           "message":  "the Upscayl module is coming up",
+                           "model":  null,
+                           "license":  null,
+                           "args":  ""
+                       },
+                       {
+                           "event":  "upscayl.batch",
+                           "message":  "batch of 3 from \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\batch with upscayl:bundled/upscayl-lite-4x: 2 written, 1 failed",
+                           "model":  "upscayl:bundled/upscayl-lite-4x",
+                           "license":  "BSD-3-Clause",
+                           "args":  "-i \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\batch -o \u003crepo\u003e\\modules\\upscayl\\examples\\out\\06\\upscayl_png_upscayl-lite-4x_2x -m \u003crepo\u003e\\modules\\upscayl\\engine\\models -n upscayl-lite-4x -z 4 -s 2 -f png -c 0"
+                       }
+                   ]
+    },
+    {
+        "graph":  "07-long-batch-job.json",
+        "command":  "hollowdeck --project modules/upscayl/examples/upscayl-examples.hollow run modules/upscayl/examples/07-long-batch-job.json --attended",
+        "exit_code":  0,
+        "seconds":  396.7,
+        "status":  "finished",
+        "error":  "",
+        "refused":  [
+
+                    ],
+        "summary":  "start_job_1__job_id=\u0027j1a11ef24ece-0\u0027, start_job_1__state=\u0027queued\u0027, start_job_1__finished=False, start_job_1__progress=0.0, start_job_1__output=\u0027\u0027, start_job_1__outputs=[], start_job_1__failed=[], start_job_1__error=\u0027\u0027, start_job_1__elapsed_ms=0, wait_job_2__job_id=\u0027j1a11ef24ece-0\u0027, wait_job_2__state=\u0027running\u0027, wait_job_2__finished=False, wait_job_2__progress=70.0, wait_job_2__output=\u0027\u0027, wait_jo...",
+        "events":  [
+                       {
+                           "event":  "upscayl.started",
+                           "message":  "the Upscayl module is coming up",
+                           "model":  null,
+                           "license":  null,
+                           "args":  ""
+                       },
+                       {
+                           "event":  "upscayl.job.queued",
+                           "message":  "queued batch job j1a11ef24ece-0",
+                           "model":  null,
+                           "license":  null,
+                           "args":  ""
+                       },
+                       {
+                           "event":  "upscayl.batch",
+                           "message":  "batch of 80 from \u003crepo\u003e\\modules\\upscayl\\examples\\out\\long-batch with upscayl:bundled/ultrasharp-4x: 80 written, 0 failed",
+                           "model":  "upscayl:bundled/ultrasharp-4x",
+                           "license":  "CC-BY-NC-SA-4.0",
+                           "args":  "-i \u003crepo\u003e\\modules\\upscayl\\examples\\out\\long-batch -o \u003crepo\u003e\\modules\\upscayl\\examples\\out\\07\\upscayl_png_ultrasharp-4x_4x -m \u003crepo\u003e\\modules\\upscayl\\engine\\models -n ultrasharp-4x -z 4 -s 4 -f png -c 0 -x"
+                       }
+                   ]
+    },
+    {
+        "graph":  "08-unattended-box-off.json",
+        "command":  "hollowdeck --project modules/upscayl/examples/upscayl-examples.hollow run modules/upscayl/examples/08-unattended-box-off.json",
+        "exit_code":  1,
+        "seconds":  1.4,
+        "status":  "failed",
+        "error":  "error: upscayl/upscale_image node \u0027upscale_image_1\u0027 writes to this machine, and its \u0027Allow in unattended runs\u0027 box is not ticked, so an unattended run will not run it. Tick the box on the node to let it run with nobody watching, or run the graph attended -- from the editor, or with `hollowdeck run --attended`. (node 1)",
+        "refused":  [
+                        "upscayl/upscale_image node \u0027upscale_image_1\u0027 writes to this machine, and its \u0027Allow in unattended runs\u0027 box is not ticked, so an unattended run will not run it. Tick the box on the node to let it run with nobody watching, or run the graph attended -- from the editor, or with `hollowdeck run --attended`."
+                    ],
+        "summary":  "",
+        "events":  [
+
+                   ]
+    },
+    {
+        "graph":  "09-unattended-box-on.json",
+        "command":  "hollowdeck --project modules/upscayl/examples/upscayl-examples.hollow run modules/upscayl/examples/09-unattended-box-on.json",
+        "exit_code":  0,
+        "seconds":  5.4,
+        "status":  "finished",
+        "error":  "",
+        "refused":  [
+
+                    ],
+        "summary":  "upscale_image_1__output=\u0027\u003crepo\u003e\\\\modules\\\\upscayl\\\\examples\\\\out\\\\09\\\\sample_upscayl_2x_upscayl-lite-4x.png\u0027, upscale_image_1__width=512, upscale_image_1__height=512, upscale_image_1__elapsed_ms=1216, upscale_image_1__model=\u0027upscayl:bundled/upscayl-lite-4x\u0027, upscale_image_1__license=\u0027BSD-3-Clause\u0027",
+        "events":  [
+                       {
+                           "event":  "upscayl.started",
+                           "message":  "the Upscayl module is coming up",
+                           "model":  null,
+                           "license":  null,
+                           "args":  ""
+                       },
+                       {
+                           "event":  "upscayl.upscaled",
+                           "message":  "upscaled \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png with upscayl:bundled/upscayl-lite-4x",
+                           "model":  "upscayl:bundled/upscayl-lite-4x",
+                           "license":  "BSD-3-Clause",
+                           "args":  "-i \u003crepo\u003e\\modules\\upscayl\\examples\\samples\\sample.png -o \u003crepo\u003e\\modules\\upscayl\\examples\\out\\09\\sample_upscayl_2x_upscayl-lite-4x.png -m \u003crepo\u003e\\modules\\upscayl\\engine\\models -n upscayl-lite-4x -z 4 -s 2 -f png -c 0"
+                       }
+                   ]
+    }
+]

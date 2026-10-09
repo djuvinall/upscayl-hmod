@@ -1,0 +1,64 @@
+{
+  "name": "upscayl 05: copy metadata",
+  "description": "tagged.jpg carries EXIF Artist, Copyright and ImageDescription; the output should too (check with exiftool).",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "upscayl/upscale_image",
+      "title": "Copy metadata",
+      "values": {
+        "input": "samples/tagged.jpg",
+        "output": "out/05/",
+        "model": "upscayl-lite-4x",
+        "scale": 2,
+        "format": "jpg",
+        "copy_metadata": true,
+        "overwrite": true
+      },
+      "pos": [
+        40,
+        200
+      ]
+    },
+    {
+      "id": "10",
+      "type": "core/sink",
+      "title": "1.output",
+      "values": {
+        "label": "1.output"
+      },
+      "pos": [
+        420,
+        80
+      ]
+    },
+    {
+      "id": "11",
+      "type": "core/sink",
+      "title": "1.width",
+      "values": {
+        "label": "1.width"
+      },
+      "pos": [
+        420,
+        150
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "1",
+      "from_node": "1",
+      "from_socket": "output",
+      "to_node": "10",
+      "to_socket": "value"
+    },
+    {
+      "id": "2",
+      "from_node": "1",
+      "from_socket": "width",
+      "to_node": "11",
+      "to_socket": "value"
+    }
+  ]
+}
