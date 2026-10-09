@@ -1,0 +1,100 @@
+{
+  "name": "upscayl 02: custom model by .param path",
+  "description": "custom_model as a path relative to the project folder; needs the engine staged (scripts/sync-engine.ps1). license reads 'unrecorded' for a path.",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "upscayl/upscale_image",
+      "title": "Custom model (.param path)",
+      "values": {
+        "input": "samples/sample.png",
+        "output": "out/02/",
+        "custom_model": "../engine/models/upscayl-lite-4x.param",
+        "scale": 2,
+        "overwrite": true
+      },
+      "pos": [
+        40,
+        200
+      ]
+    },
+    {
+      "id": "10",
+      "type": "core/sink",
+      "title": "1.output",
+      "values": {
+        "label": "1.output"
+      },
+      "pos": [
+        420,
+        80
+      ]
+    },
+    {
+      "id": "11",
+      "type": "core/sink",
+      "title": "1.width",
+      "values": {
+        "label": "1.width"
+      },
+      "pos": [
+        420,
+        150
+      ]
+    },
+    {
+      "id": "12",
+      "type": "core/sink",
+      "title": "1.model",
+      "values": {
+        "label": "1.model"
+      },
+      "pos": [
+        420,
+        220
+      ]
+    },
+    {
+      "id": "13",
+      "type": "core/sink",
+      "title": "1.license",
+      "values": {
+        "label": "1.license"
+      },
+      "pos": [
+        420,
+        290
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "1",
+      "from_node": "1",
+      "from_socket": "output",
+      "to_node": "10",
+      "to_socket": "value"
+    },
+    {
+      "id": "2",
+      "from_node": "1",
+      "from_socket": "width",
+      "to_node": "11",
+      "to_socket": "value"
+    },
+    {
+      "id": "3",
+      "from_node": "1",
+      "from_socket": "model",
+      "to_node": "12",
+      "to_socket": "value"
+    },
+    {
+      "id": "4",
+      "from_node": "1",
+      "from_socket": "license",
+      "to_node": "13",
+      "to_socket": "value"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "name": "upscayl 06: batch with a corrupt file",
+  "description": "Two good images and one truncated JPEG: two outputs, one failed entry naming corrupt.jpg, complete false, and the node does not fail.",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "upscayl/upscale_batch",
+      "title": "Folder with a corrupt file",
+      "values": {
+        "input_folder": "samples/batch",
+        "output_folder": "out/06",
+        "model": "upscayl-lite-4x",
+        "scale": 2,
+        "overwrite": true
+      },
+      "pos": [
+        40,
+        200
+      ]
+    },
+    {
+      "id": "10",
+      "type": "core/sink",
+      "title": "1.output_folder",
+      "values": {
+        "label": "1.output_folder"
+      },
+      "pos": [
+        420,
+        80
+      ]
+    },
+    {
+      "id": "11",
+      "type": "core/sink",
+      "title": "1.outputs",
+      "values": {
+        "label": "1.outputs"
+      },
+      "pos": [
+        420,
+        150
+      ]
+    },
+    {
+      "id": "12",
+      "type": "core/sink",
+      "title": "1.failed",
+      "values": {
+        "label": "1.failed"
+      },
+      "pos": [
+        420,
+        220
+      ]
+    },
+    {
+      "id": "13",
+      "type": "core/sink",
+      "title": "1.complete",
+      "values": {
+        "label": "1.complete"
+      },
+      "pos": [
+        420,
+        290
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "1",
+      "from_node": "1",
+      "from_socket": "output_folder",
+      "to_node": "10",
+      "to_socket": "value"
+    },
+    {
+      "id": "2",
+      "from_node": "1",
+      "from_socket": "outputs",
+      "to_node": "11",
+      "to_socket": "value"
+    },
+    {
+      "id": "3",
+      "from_node": "1",
+      "from_socket": "failed",
+      "to_node": "12",
+      "to_socket": "value"
+    },
+    {
+      "id": "4",
+      "from_node": "1",
+      "from_socket": "complete",
+      "to_node": "13",
+      "to_socket": "value"
+    }
+  ]
+}

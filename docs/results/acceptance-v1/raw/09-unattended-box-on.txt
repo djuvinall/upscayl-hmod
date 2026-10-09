@@ -1,0 +1,14 @@
+run        20261009-044234-21db1f
+graph      <repo>\modules\upscayl\examples\09-unattended-box-on.json
+status     finished
+took       4106 ms
+attended   no: a tool node runs only with 'Allow in unattended runs' ticked
+folder     <repo>\.scratch\hd-data\runs\20261009-044234-21db1f
+calls      upscayl/upscale_image
+project    <repo>\modules\upscayl\examples\upscayl-examples.hollow
+output     <repo>\.scratch\hd-data\module_data\scheduler\output/20261009-044234-21db1f.json
+           [upscale_image_1:upscayl/upscale_image] calling the upscayl module
+           [sink_10:sink] 1.output = '<repo>\\modules\\upscayl\\examples\\out\\09\\sample_upscayl_2x_upscayl-lite-4x.png'
+action     #1 step 1  upscale_image_1 (upscayl/upscale_image)  finished  1813.989 ms
+action     #2 step 2  sink_10 (core/sink)  finished  0.021 ms
+result     upscale_image_1__output='<repo>\\modules\\upscayl\\examples\\out\\09\\sample_upscayl_2x_upscayl-lite-4x.png', upscale_image_1__width=512, upscale_image_1__height=512, upscale_image_1__elapsed_ms=1216, upscale_image_1__model='upscayl:bundled/upscayl-lite-4x', upscale_image_1__license='BSD-3-Clause'

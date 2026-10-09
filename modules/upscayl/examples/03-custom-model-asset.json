@@ -1,0 +1,121 @@
+{
+  "name": "upscayl 03: custom model from an Asset node",
+  "description": "An asset/reference node for the bundled-remacri-4x model asset, wired into custom_model. Remacri is CC BY-NC-SA 4.0: license says so.",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "asset/reference",
+      "title": "Remacri (asset)",
+      "values": {
+        "asset": {
+          "owner": "upscayl",
+          "id": "bundled-remacri-4x",
+          "name": "remacri-4x",
+          "captured_against": "0.1.0",
+          "owner_version": "0.1.0",
+          "available": true,
+          "interface": {
+            "inputs": [],
+            "outputs": [
+              {
+                "name": "model",
+                "type": "str",
+                "description": "A model token for upscayl's custom_model socket"
+              }
+            ]
+          },
+          "payload": {
+            "outputs": {
+              "model": "upscayl:bundled/remacri-4x"
+            }
+          }
+        }
+      },
+      "pos": [
+        40,
+        200
+      ]
+    },
+    {
+      "id": "2",
+      "type": "upscayl/upscale_image",
+      "title": "Upscale with the asset's model",
+      "values": {
+        "input": "samples/sample.png",
+        "output": "out/03/",
+        "scale": 2,
+        "overwrite": true
+      },
+      "pos": [
+        400,
+        200
+      ]
+    },
+    {
+      "id": "10",
+      "type": "core/sink",
+      "title": "2.output",
+      "values": {
+        "label": "2.output"
+      },
+      "pos": [
+        760,
+        80
+      ]
+    },
+    {
+      "id": "11",
+      "type": "core/sink",
+      "title": "2.model",
+      "values": {
+        "label": "2.model"
+      },
+      "pos": [
+        760,
+        150
+      ]
+    },
+    {
+      "id": "12",
+      "type": "core/sink",
+      "title": "2.license",
+      "values": {
+        "label": "2.license"
+      },
+      "pos": [
+        760,
+        220
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "1",
+      "from_node": "1",
+      "from_socket": "value",
+      "to_node": "2",
+      "to_socket": "custom_model"
+    },
+    {
+      "id": "2",
+      "from_node": "2",
+      "from_socket": "output",
+      "to_node": "10",
+      "to_socket": "value"
+    },
+    {
+      "id": "3",
+      "from_node": "2",
+      "from_socket": "model",
+      "to_node": "11",
+      "to_socket": "value"
+    },
+    {
+      "id": "4",
+      "from_node": "2",
+      "from_socket": "license",
+      "to_node": "12",
+      "to_socket": "value"
+    }
+  ]
+}

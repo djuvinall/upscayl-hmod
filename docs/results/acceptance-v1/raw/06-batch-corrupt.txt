@@ -1,0 +1,20 @@
+run        20261009-043552-078fc5
+graph      <repo>\modules\upscayl\examples\06-batch-corrupt.json
+status     finished
+took       2328 ms
+attended   yes (--attended): every node on the graph may run
+folder     <repo>\.scratch\hd-data\runs\20261009-043552-078fc5
+calls      upscayl/upscale_batch
+project    <repo>\modules\upscayl\examples\upscayl-examples.hollow
+output     <repo>\.scratch\hd-data\module_data\scheduler\output/20261009-043552-078fc5.json
+           [upscale_batch_1:upscayl/upscale_batch] calling the upscayl module
+           [sink_10:sink] 1.output_folder = '<repo>\\modules\\upscayl\\examples\\out\\06\\upscayl_png_upscayl-lite-4x_2x'
+           [sink_11:sink] 1.outputs = ['<repo>\\modules\\upscayl\\examples\\out\\06\\upscayl_png_upscayl-lite-4x_2x\\a.png', '<repo>\\modules\\upscayl\\examples\\out\\06\\upscayl_png_upscayl-lite-4x_2x\\b.png']
+           [sink_12:sink] 1.failed = ["corrupt.jpg: Couldn't read the image '<repo>\\modules\\upscayl\\examples\\samples\\batch/corrupt.jpg'!"]
+           [sink_13:sink] 1.complete = False
+action     #1 step 1  upscale_batch_1 (upscayl/upscale_batch)  finished  1648.653 ms
+action     #2 step 2  sink_10 (core/sink)  finished  0.017 ms
+action     #3 step 2  sink_11 (core/sink)  finished  0.012 ms
+action     #4 step 2  sink_12 (core/sink)  finished  0.014 ms
+action     #5 step 2  sink_13 (core/sink)  finished  0.01 ms
+result     upscale_batch_1__output_folder='<repo>\\modules\\upscayl\\examples\\out\\06\\upscayl_png_upscayl-lite-4x_2x', upscale_batch_1__outputs=['<repo>\\modules\\upscayl\\examples\\out\\06\\upscayl_png_upscayl-lite-4x_2x\\a.png', '<repo>\\modules\\upscayl\\examples\\out\\06\\upscayl_png_upscayl-lite-4x_2x\\b.png'], u...

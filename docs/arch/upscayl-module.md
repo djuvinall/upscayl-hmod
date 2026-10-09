@@ -52,6 +52,8 @@ Built routes beyond the contract's: `GET/POST api/assets`, `GET/DELETE api/asset
 
 ## Notes
 
+- Examples and acceptance (#15): `modules/upscayl/examples/` holds one graph per capability, a project file so their relative paths resolve there, and `run-acceptance.ps1`, which records every run into `docs/results/acceptance-v1/`.
+
 - Performance (#7, `docs/results/perf-baseline.md`): keep `tile_size` 0 as the default; large models take about 4.5 s per input megapixel at 4x (about 16.5 s with TTA). A double run with a large model and TTA over about 1 MP belongs in a job.
 
 - `.hmod` size is dominated by models (~150 MB for the bundled set). Whether every model ships bundled is decided per model by its license.

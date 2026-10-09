@@ -1,0 +1,82 @@
+{
+  "name": "upscayl 04: double upscayl",
+  "description": "Scale 2 per pass, twice: a 256 px input comes out 1024 px.",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "upscayl/upscale_image",
+      "title": "Double upscayl 2x2",
+      "values": {
+        "input": "samples/sample.png",
+        "output": "out/04/",
+        "model": "upscayl-lite-4x",
+        "scale": 2,
+        "double_upscayl": true,
+        "overwrite": true
+      },
+      "pos": [
+        40,
+        200
+      ]
+    },
+    {
+      "id": "10",
+      "type": "core/sink",
+      "title": "1.output",
+      "values": {
+        "label": "1.output"
+      },
+      "pos": [
+        420,
+        80
+      ]
+    },
+    {
+      "id": "11",
+      "type": "core/sink",
+      "title": "1.width",
+      "values": {
+        "label": "1.width"
+      },
+      "pos": [
+        420,
+        150
+      ]
+    },
+    {
+      "id": "12",
+      "type": "core/sink",
+      "title": "1.height",
+      "values": {
+        "label": "1.height"
+      },
+      "pos": [
+        420,
+        220
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "1",
+      "from_node": "1",
+      "from_socket": "output",
+      "to_node": "10",
+      "to_socket": "value"
+    },
+    {
+      "id": "2",
+      "from_node": "1",
+      "from_socket": "width",
+      "to_node": "11",
+      "to_socket": "value"
+    },
+    {
+      "id": "3",
+      "from_node": "1",
+      "from_socket": "height",
+      "to_node": "12",
+      "to_socket": "value"
+    }
+  ]
+}

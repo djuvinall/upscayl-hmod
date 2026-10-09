@@ -1,0 +1,177 @@
+{
+  "name": "upscayl 07: a long batch as a job",
+  "description": "start_job, then two wait_job calls of up to 280 s each: the batch can run about 9 minutes, past the 300 s tool timeout. Fill out/long-batch first with make-long-batch.ps1.",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "upscayl/start_job",
+      "title": "Start long batch",
+      "values": {
+        "kind": "batch",
+        "input_folder": "out/long-batch",
+        "output_folder": "out/07",
+        "model": "ultrasharp-4x",
+        "tta": true,
+        "overwrite": true
+      },
+      "pos": [
+        40,
+        200
+      ]
+    },
+    {
+      "id": "2",
+      "type": "upscayl/wait_job",
+      "title": "Wait (up to 280 s)",
+      "values": {
+        "timeout_s": 280
+      },
+      "pos": [
+        380,
+        200
+      ]
+    },
+    {
+      "id": "3",
+      "type": "upscayl/wait_job",
+      "title": "Wait again (up to 280 s)",
+      "values": {
+        "timeout_s": 280
+      },
+      "pos": [
+        720,
+        200
+      ]
+    },
+    {
+      "id": "10",
+      "type": "core/sink",
+      "title": "3.state",
+      "values": {
+        "label": "3.state"
+      },
+      "pos": [
+        1060,
+        80
+      ]
+    },
+    {
+      "id": "11",
+      "type": "core/sink",
+      "title": "3.finished",
+      "values": {
+        "label": "3.finished"
+      },
+      "pos": [
+        1060,
+        150
+      ]
+    },
+    {
+      "id": "12",
+      "type": "core/sink",
+      "title": "3.progress",
+      "values": {
+        "label": "3.progress"
+      },
+      "pos": [
+        1060,
+        220
+      ]
+    },
+    {
+      "id": "13",
+      "type": "core/sink",
+      "title": "3.outputs",
+      "values": {
+        "label": "3.outputs"
+      },
+      "pos": [
+        1060,
+        290
+      ]
+    },
+    {
+      "id": "14",
+      "type": "core/sink",
+      "title": "3.failed",
+      "values": {
+        "label": "3.failed"
+      },
+      "pos": [
+        1060,
+        360
+      ]
+    },
+    {
+      "id": "15",
+      "type": "core/sink",
+      "title": "3.elapsed_ms",
+      "values": {
+        "label": "3.elapsed_ms"
+      },
+      "pos": [
+        1060,
+        430
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "1",
+      "from_node": "1",
+      "from_socket": "job_id",
+      "to_node": "2",
+      "to_socket": "job_id"
+    },
+    {
+      "id": "2",
+      "from_node": "2",
+      "from_socket": "job_id",
+      "to_node": "3",
+      "to_socket": "job_id"
+    },
+    {
+      "id": "3",
+      "from_node": "3",
+      "from_socket": "state",
+      "to_node": "10",
+      "to_socket": "value"
+    },
+    {
+      "id": "4",
+      "from_node": "3",
+      "from_socket": "finished",
+      "to_node": "11",
+      "to_socket": "value"
+    },
+    {
+      "id": "5",
+      "from_node": "3",
+      "from_socket": "progress",
+      "to_node": "12",
+      "to_socket": "value"
+    },
+    {
+      "id": "6",
+      "from_node": "3",
+      "from_socket": "outputs",
+      "to_node": "13",
+      "to_socket": "value"
+    },
+    {
+      "id": "7",
+      "from_node": "3",
+      "from_socket": "failed",
+      "to_node": "14",
+      "to_socket": "value"
+    },
+    {
+      "id": "8",
+      "from_node": "3",
+      "from_socket": "elapsed_ms",
+      "to_node": "15",
+      "to_socket": "value"
+    }
+  ]
+}
