@@ -42,7 +42,7 @@ Hosted check, against a disposable data dir so real HollowDeck state is untouche
 ## Repository etiquette
 
 - `hmod/main` changes only by merging a PR with **Rebase and merge** (upstream-sync PRs excepted, above). Work on `<type>/<issue>-<slug>` — `gh issue develop <n> --name <branch> --base hmod/main --checkout` links the branch to its issue.
-- After cloning: `git config core.hooksPath .githooks` and `git remote add upstream https://github.com/upscayl/upscayl.git` then `git remote set-url --push upstream DISABLE`. The hooks refuse commits and pushes on the default branch and enforce the commit format. Never `--no-verify`.
+- After cloning: `git config core.hooksPath .githooks` and `git remote add upstream https://github.com/upscayl/upscayl.git` then `git remote set-url --push upstream DISABLE`, then `gh repo set-default djuvinall/upscayl-hmod` (without it `gh` targets upstream). The hooks refuse commits and pushes on the default branch and enforce the commit format. Never `--no-verify`.
 - Commits: Conventional Commits subject, 72 chars max; a body saying what changed and why; `Refs #n`. No pasted file lists. Autosquash `fixup!` commits before a PR is marked ready.
 - PRs target `hmod/main`, follow `.github/pull_request_template.md`, and say `Closes #n`.
 - CI is not installed yet (see `decisions.md`, CI deferred). Once `ci.yml` exists it runs only on PRs labelled `ci`; label when the diff touches: `modules/upscayl/**`, `.github/workflows/ci.yml`.

@@ -8,9 +8,9 @@ Upstream's Electron app is a GUI over one CLI binary, `upscayl-bin` (the upscayl
 |---|---|---|---|
 | upstream-engine | `upscayl-bin` CLI and the NCNN model files it loads | upstream, real | [docs/arch/upstream-engine.md](docs/arch/upstream-engine.md) |
 | upstream-electron | Upstream's GUI; the reference for how settings become CLI arguments | upstream, reference only | [docs/arch/upstream-electron.md](docs/arch/upstream-electron.md) |
-| upscayl-module | The HollowDeck module (`modules/upscayl/`, id `upscayl`): tools, panel, process supervision | planned | [docs/arch/upscayl-module.md](docs/arch/upscayl-module.md) |
-| model-assets | Bundled and imported NCNN models as `ncnn_model` assets, each with its own license | planned | [docs/arch/model-assets.md](docs/arch/model-assets.md) |
-| jobs | Long-running upscale work that outlives a single tool call | planned | [docs/arch/jobs.md](docs/arch/jobs.md) |
+| upscayl-module | The HollowDeck module (`modules/upscayl/`, id `upscayl`): tools, panel, process supervision | built | [docs/arch/upscayl-module.md](docs/arch/upscayl-module.md) |
+| model-assets | Bundled and imported NCNN models as `ncnn_model` assets, each with its own license | built | [docs/arch/model-assets.md](docs/arch/model-assets.md) |
+| jobs | Long-running upscale work that outlives a single tool call | module half built; Orchestrator half planned | [docs/arch/jobs.md](docs/arch/jobs.md) |
 
 ## Cross-cutting
 

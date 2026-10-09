@@ -14,9 +14,9 @@ The Orchestrator layers are djuvinall/Orchestrator#93 (timeout setting, per-grap
 
 ## Public interface
 
-Tools (`src/jobs.rs`): `start_job` takes `kind` (`image` or `batch`) plus every `upscale_image` socket and `input_folder`/`output_folder`, checks the request as the synchronous tool would (a bad request is a 400 now, never a failed job later), queues it and answers at once. `job_status`, `wait_job` (`timeout_s`, default 240, capped at 280) and `cancel_job` take `job_id`. All four answer the same outputs: `job_id`, `state`, `finished`, `progress`, `output`, `outputs`, `failed`, `error`, `elapsed_ms`. `GET api/jobs` lists every job, newest first, for the panel (a progress stream is the panel's issue, #14).
+Tools (`src/jobs.rs`): `start_job` takes `kind` (`image` or `batch`) plus every `upscale_image` socket and `input_folder`/`output_folder`, checks the request as the synchronous tool would (a bad request is a 400 now, never a failed job later), queues it and answers at once. `job_status`, `wait_job` (`timeout_s`, default 240, capped at 280) and `cancel_job` take `job_id`. All four answer the same outputs: `job_id`, `state`, `finished`, `progress`, `output`, `outputs`, `failed`, `error`, `elapsed_ms`. `GET api/jobs` lists every job, newest first, for the panel, which polls it (#14).
 
-One worker thread runs jobs one at a time; records live in `<data dir>/jobs/<id>.json` and are rewritten on every state change and every 2% of progress. `GET /lifecycle` holds while a job is queued or running. Cancelling stops the engine within one poll (50 ms); a batch keeps what it already wrote.
+One worker thread runs jobs one at a time; records live in `<data dir>/jobs/<id>.json` and are rewritten on every state change and every 2% of progress. `GET /lifecycle` holds while a job is queued or running. Cancelling stops the engine within one poll (50 ms); a batch keeps what it already wrote, lists the rest as `not processed, the job was cancelled`, and keeps the progress it reached (#32). A folder's progress counts finished files, not the engine's per-file percentages, which interleave in directory mode (#28).
 
 ## Invariants
 
