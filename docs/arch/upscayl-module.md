@@ -11,7 +11,7 @@ Tools in `module.json` (node types `upscayl/<id>`). Ids and socket names are per
 | Tool | Does | `effects` |
 |---|---|---|
 | `upscale_image` | one image, synchronous; **built (#9)** | `writes` (decided: the effect a person sees is a written file; the binary it runs is fixed, not caller-chosen) |
-| `upscale_batch` | a directory, synchronous | `writes` |
+| `upscale_batch` | a directory, synchronous; **built (#11)** | `writes` |
 | `start_job` / `job_status` / `wait_job` / `cancel_job` | asynchronous form of the above (see `jobs.md`) | `writes` / `reads` / `reads` / `writes` |
 | `list_models` | bundled + imported models with their licenses | `reads` |
 | `import_model` | copy a `.param`/`.bin` pair into the module's data dir and create its asset | `writes` |
@@ -19,6 +19,8 @@ Tools in `module.json` (node types `upscayl/<id>`). Ids and socket names are per
 Inputs shared by the upscale tools (one socket per GUI setting and CLI flag): `input` (path), `output` (path, optional), `model` (`select` of the bundled models), `custom_model` (`str`, overrides `model` when non-empty: a `.param` path or a model token from an asset), `model_scale` (`-z`), `scale` (`-s`, 1–16), `width` (`-w`), `resize` (`-r`, `WxH`), `resize_filter`, `format`, `compression` (WebP only), `gpu_id`, `tile_size`, `threads` (`-j`), `tta`, `double_upscayl`, `copy_metadata`, `overwrite`.
 
 Argument rules, from `docs/results/engine-probe.md`: `-z` and `-s` are always sent; `width` and `resize` each replace `-s` and are mutually exclusive (a call setting both is refused); the output extension is derived from `format`; model files are checked before spawning; success is read from stderr, not the exit code.
+
+Built (#11): `POST tools/upscale_batch` with `input_folder`, `output_folder` and every `upscale_image` setting. Writes into `upscayl_<format>_<model>_<size>` inside the output folder (upstream's naming), files keeping their stems. Uses the engine's directory mode when it can (one model load, parallel files), per-file runs for double upscayl or when existing outputs must be skipped. Outputs `output_folder`, `outputs` (list), `failed` (list of "name: reason"), `complete`, `elapsed_ms`, `model`, `license`. Inputs that share a stem (`a.jpg`, `a.png`) are refused up front. A budget run-out lists the unprocessed files under `failed` rather than failing the node.
 
 Built (#10): `double_upscayl` and `copy_metadata` sockets. Double runs pass 1 at the requested scale into a lossless PNG under the data dir's `tmp/` (removed afterwards) and pass 2 with compression, width/resize and TTA; a double run is named with the scale it really produces (`scale x scale`), where upstream names it with the single-pass scale. `copy_metadata` runs the staged exiftool (`-overwrite_original_in_place -tagsFromFile <in> <out>`). Outputs larger than the format allows (WebP 16383 px, JPEG 65535 px a side) are refused before running.
 

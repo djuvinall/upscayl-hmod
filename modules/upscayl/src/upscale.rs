@@ -575,7 +575,11 @@ pub fn execute(
 
 /// Upstream's metadata copy: `exiftool -overwrite_original_in_place -tagsFromFile <in>
 /// <out>`. The output already exists when this runs, so a failure says so.
-fn copy_metadata(ctx: &ModuleContext, input: &Path, output: &Path) -> Result<(), (u16, String)> {
+pub fn copy_metadata(
+    ctx: &ModuleContext,
+    input: &Path,
+    output: &Path,
+) -> Result<(), (u16, String)> {
     let exe = ctx.module_path(paths::EXIFTOOL_REL);
     let mut cmd = std::process::Command::new(&exe);
     cmd.arg("-overwrite_original_in_place")

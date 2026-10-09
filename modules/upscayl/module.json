@@ -276,6 +276,251 @@
           "Making a sprite or texture larger for a game asset"
         ]
       }
+    },
+    {
+      "id": "upscale_batch",
+      "title": "Upscale folder",
+      "category": "image",
+      "description": "Upscale every image in a folder with Upscayl's engine, with the same settings as Upscale image. Files that fail are listed, not fatal. Stops after about 280 s; use start_job for big folders.",
+      "inputs": [
+        {
+          "name": "input_folder",
+          "type": "str",
+          "description": "The folder of images to upscale (PNG, JPEG, WebP; not subfolders). A relative path is relative to the open project's folder.",
+          "widget": "path",
+          "required": true,
+          "label": "input folder"
+        },
+        {
+          "name": "output_folder",
+          "type": "str",
+          "description": "Where the results go. Empty: the input folder. Either way they land in a subfolder named upscayl_<format>_<model>_<size>, as Upscayl does, each file keeping its name.",
+          "widget": "path",
+          "default": "",
+          "required": false,
+          "label": "output folder"
+        },
+        {
+          "name": "model",
+          "type": "str",
+          "description": "A bundled model. Overridden by custom_model when that is set. Non-commercial models (Remacri, Ultramix, Ultrasharp) are CC BY-NC-SA 4.0.",
+          "widget": "select",
+          "options": [
+            "upscayl-standard-4x",
+            "upscayl-lite-4x",
+            "high-fidelity-4x",
+            "remacri-4x",
+            "ultramix-balanced-4x",
+            "ultrasharp-4x",
+            "digital-art-4x",
+            "realesr-animevideov3-x2",
+            "realesr-animevideov3-x3",
+            "realesr-animevideov3-x4"
+          ],
+          "default": "upscayl-standard-4x",
+          "required": false
+        },
+        {
+          "name": "custom_model",
+          "type": "str",
+          "description": "Overrides model: a .param file (its .bin beside it, both in a folder named models), or a model token from a model asset (upscayl:bundled/<name>).",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "model_scale",
+          "type": "int",
+          "description": "The model's native scale, sent as -z. 0 reads it from the name (x2/2x is 2, x3/3x is 3, else 4). A wrong value corrupts the output.",
+          "widget": "int",
+          "default": 0,
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "required": false,
+          "label": "model scale"
+        },
+        {
+          "name": "scale",
+          "type": "int",
+          "description": "Output scale, 1 to 16. Ignored when width or resize is set.",
+          "widget": "int",
+          "default": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "required": false
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "description": "Resize to this width in pixels, keeping aspect. 0 means unset. Cannot be combined with resize.",
+          "widget": "int",
+          "default": 0,
+          "min": 0,
+          "step": 1,
+          "required": false
+        },
+        {
+          "name": "resize",
+          "type": "str",
+          "description": "Resize to exact dimensions, WIDTHxHEIGHT (1920x1080); aspect is not kept. Empty means unset. Cannot be combined with width.",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "resize_filter",
+          "type": "str",
+          "description": "The filter for width or resize.",
+          "widget": "select",
+          "options": [
+            "default",
+            "box",
+            "triangle",
+            "cubicbspline",
+            "catmullrom",
+            "mitchell",
+            "pointsample"
+          ],
+          "default": "default",
+          "required": false,
+          "label": "resize filter"
+        },
+        {
+          "name": "format",
+          "type": "str",
+          "description": "Output format.",
+          "widget": "select",
+          "options": [
+            "png",
+            "jpg",
+            "webp"
+          ],
+          "default": "png",
+          "required": false
+        },
+        {
+          "name": "compression",
+          "type": "int",
+          "description": "WebP only: 0 to 100, higher is smaller and lossier. PNG and JPEG ignore it.",
+          "widget": "int",
+          "default": 0,
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "required": false
+        },
+        {
+          "name": "gpu_id",
+          "type": "str",
+          "description": "The GPU to use: empty for automatic, a number (0), or several (0,1).",
+          "widget": "string",
+          "default": "",
+          "required": false,
+          "label": "GPU"
+        },
+        {
+          "name": "tile_size",
+          "type": "str",
+          "description": "Tile size: 0 for automatic, or 32 and up; one per GPU (0,0). Smaller uses less VRAM and is slower.",
+          "widget": "string",
+          "default": "0",
+          "required": false,
+          "label": "tile size"
+        },
+        {
+          "name": "threads",
+          "type": "str",
+          "description": "Thread counts as load:proc:save, like 1:2:2. Empty for the engine's default.",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "tta",
+          "type": "bool",
+          "description": "Test-time augmentation: slower, sometimes cleaner.",
+          "widget": "bool",
+          "default": false,
+          "required": false,
+          "label": "TTA"
+        },
+        {
+          "name": "double_upscayl",
+          "type": "bool",
+          "description": "Run the model twice, the second time on the first result, as Upscayl's Double Upscayl does. scale applies to each pass, so scale 4 gives 16x. Compression, width, resize and TTA apply to the second pass only.",
+          "widget": "bool",
+          "default": false,
+          "required": false,
+          "label": "double upscayl"
+        },
+        {
+          "name": "copy_metadata",
+          "type": "bool",
+          "description": "Copy the input's metadata (EXIF, IPTC, XMP) to the output with the bundled exiftool.",
+          "widget": "bool",
+          "default": false,
+          "required": false,
+          "label": "copy metadata"
+        },
+        {
+          "name": "overwrite",
+          "type": "bool",
+          "description": "Replace outputs that already exist. Off: existing outputs are left alone and listed under failed.",
+          "widget": "bool",
+          "default": false,
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output_folder",
+          "type": "str",
+          "description": "The subfolder the results were written to."
+        },
+        {
+          "name": "outputs",
+          "type": "list[str]",
+          "description": "Every file written, in input order."
+        },
+        {
+          "name": "failed",
+          "type": "list[str]",
+          "description": "One entry per input that was not written: \"name: reason\"."
+        },
+        {
+          "name": "complete",
+          "type": "bool",
+          "description": "True when every input was written."
+        },
+        {
+          "name": "elapsed_ms",
+          "type": "int",
+          "description": "How long the batch took."
+        },
+        {
+          "name": "model",
+          "type": "str",
+          "description": "The model used."
+        },
+        {
+          "name": "license",
+          "type": "str",
+          "description": "That model's license."
+        }
+      ],
+      "effects": "writes",
+      "calls_model": false,
+      "doc": {
+        "what": "Upscales every PNG, JPEG and WebP image in one folder.",
+        "how": "Runs the engine once over the folder (the model loads once and files run in parallel), or once per file for double upscayl or when some outputs already exist and overwrite is off. Writes into an upscayl_<format>_<model>_<size> subfolder. An unreadable file is reported under failed and the rest still run.",
+        "why": "Upscayl's batch mode as a node.",
+        "best_uses": [
+          "Upscaling a folder of textures or sprites",
+          "A scheduled pass over a drop folder"
+        ]
+      }
     }
   ]
 }
