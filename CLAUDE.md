@@ -26,6 +26,19 @@ Devon's fork of [upscayl/upscayl](https://github.com/upscayl/upscayl), carrying 
 - The Rust module needs the HollowDeck checkout as a sibling (`..\HollowDeck`) for the `hollowdeck-module` SDK, which is not on crates.io. Rust 1.89 is the floor (INTEROP.md).
 - Engine binaries and models are **not re-committed**: they live in upstream's `resources/` and `models/` and are copied into the module by its sync script (planned, see `docs/arch/upscayl-module.md`).
 
+## Verification
+
+From `modules/upscayl` (Windows, PowerShell):
+
+```powershell
+cargo build
+cargo test
+cargo clippy --all-targets -- -D warnings
+cargo fmt --check
+```
+
+Hosted check, against a disposable data dir so real HollowDeck state is untouched: write `{"roots": ["<repo>/modules"]}` to `<dir>\scan_roots.json`, set `HDECK_DATA_DIR=<dir>`, run `..\HollowDeck\target\release\hollowdeck.exe serve --port 47900`, then `GET /api/modules` must show `upscayl` as `loaded` and `GET /m/upscayl/health` must answer `{"ok":true,...}`. `.scratch/` (excluded via `.git/info/exclude`) is the place for that dir.
+
 ## Repository etiquette
 
 - `hmod/main` changes only by merging a PR with **Rebase and merge** (upstream-sync PRs excepted, above). Work on `<type>/<issue>-<slug>` — `gh issue develop <n> --name <branch> --base hmod/main --checkout` links the branch to its issue.

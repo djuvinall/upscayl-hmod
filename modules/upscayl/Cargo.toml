@@ -1,0 +1,26 @@
+[package]
+name = "upscayl"
+version = "0.1.0"
+edition = "2021"
+# The SDK's floor: its event-log append takes `std::fs::File::lock` (INTEROP.md).
+rust-version = "1.89"
+publish = false
+license = "AGPL-3.0-only"
+description = "HollowDeck module driving Upscayl's upscayl-bin engine as Orchestrator tool nodes"
+
+# A standalone crate: this repo is not a cargo workspace, and without this table cargo
+# walks up looking for one.
+[workspace]
+
+[dependencies]
+# The HollowDeck module SDK. Not on crates.io, so it is reached by path -- relative, so
+# it resolves wherever this fork and HollowDeck are checked out side by side
+# (F:\localRepositories\upscayl-hmod and F:\localRepositories\HollowDeck on Devon's
+# machine). See CLAUDE.md, Environment.
+hollowdeck-module = { path = "../../../HollowDeck/crates/hollowdeck-module" }
+
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }

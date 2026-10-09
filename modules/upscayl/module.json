@@ -1,0 +1,23 @@
+{
+  "id": "upscayl",
+  "name": "Upscayl",
+  "version": "0.1.0",
+  "description": "Upscale images with Upscayl's engine (upscayl-bin, NCNN on Vulkan) from Orchestrator graphs or this panel. Bundled and imported models are assets that carry their own licenses.",
+  "kind": "process",
+  "command": ["{bin:upscayl}"],
+  "verify": ["{bin:upscayl}", "--selfcheck"],
+  "panels": [
+    {"id": "main", "title": "Upscayl", "path": ""}
+  ],
+  "requires": [],
+  "depends": {},
+  "accepts": [],
+  "license": "AGPL-3.0-only",
+  "authors": ["Devon Juvinall"],
+  "homepage": "https://github.com/djuvinall/upscayl-hmod",
+  "keywords": ["upscale", "image", "super-resolution", "ncnn", "real-esrgan"],
+  "enabled_by_default": true,
+  "provenance": "custom",
+  "function": "panel",
+  "api_version": 1
+}
