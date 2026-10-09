@@ -1,0 +1,11 @@
+/* The Upscayl panel -- only what is this module's own. Everything generic (.btn,
+ * .diag, .mono, k-panel, k-rows) comes from the vendored kit in static/vendor/.
+ * No literal colours: every colour is a var(--darkglass-*) token. */
+
+.upscayl-page {
+  padding: var(--darkglass-dimension-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--darkglass-dimension-space-5);
+  min-height: 100%;
+}

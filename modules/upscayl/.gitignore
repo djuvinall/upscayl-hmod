@@ -1,0 +1,4 @@
+# Build output, and the engine files the sync script stages from upstream's resources/.
+# Neither is source; both are reproducible.
+target/
+engine/

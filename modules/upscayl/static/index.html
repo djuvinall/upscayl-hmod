@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upscayl</title>
+  <!-- Relative URLs only: this page serves at /m/upscayl/ hosted and at / standalone. -->
+  <link rel="stylesheet" href="static/vendor/darkglass.css">
+  <link rel="stylesheet" href="static/vendor/panel.css">
+  <link rel="stylesheet" href="static/vendor/module.css">
+  <link rel="stylesheet" href="static/panel.css">
+</head>
+<body>
+  <main class="upscayl-page">
+    <section class="k-panel" id="panel" data-status="loading" data-testid="status-panel">
+      <header class="k-panel__header">
+        <span class="k-panel__title" data-view-title>Upscayl</span>
+        <span class="k-badge" id="status" data-tone="accent" data-testid="status">loading</span>
+      </header>
+      <div class="k-panel__body">
+        <div class="diag error" id="error" data-testid="error" hidden>
+          <span>&#x2715;</span>
+          <div id="error-text"></div>
+        </div>
+        <div class="k-skeleton" id="skeleton" data-testid="skeleton"></div>
+        <hd-props>
+          <div class="k-rows" data-density="dense" id="details" hidden>
+            <div class="k-row">
+              <span class="k-row__label">Version</span>
+              <span class="k-row__value mono" data-detail="version">&ndash;</span>
+            </div>
+            <div class="k-row">
+              <span class="k-row__label">Engine</span>
+              <span class="k-row__value" data-detail="engine">&ndash;</span>
+            </div>
+            <div class="k-row">
+              <span class="k-row__label">Model licenses</span>
+              <span class="k-row__value" data-detail="licenses">&ndash;</span>
+            </div>
+            <div class="k-row">
+              <span class="k-row__label">Data directory</span>
+              <span class="k-row__value mono" data-detail="data_dir">&ndash;</span>
+            </div>
+          </div>
+        </hd-props>
+      </div>
+      <footer class="k-panel__footer">
+        <button class="btn" id="refresh" type="button" data-testid="refresh"
+                data-hdeck-focus-first>Refresh</button>
+      </footer>
+    </section>
+  </main>
+  <script src="static/vendor/module.js"></script>
+  <script src="static/vendor/kit.js"></script>
+  <script src="static/panel.js"></script>
+</body>
+</html>

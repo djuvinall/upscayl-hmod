@@ -1,4 +1,4 @@
-# upscayl-module (planned)
+# upscayl-module (scaffolded; tools planned)
 
 **Responsibility:** expose every engine capability to HollowDeck as tool nodes, supervise engine processes, and own the model assets. Rust, `kind: process`, id `upscayl`, at `modules/upscayl/`.
 
@@ -20,7 +20,11 @@ Inputs shared by the upscale tools (one socket per GUI setting and CLI flag): `i
 
 Argument rules, from `docs/results/engine-probe.md`: `-z` and `-s` are always sent; `width` and `resize` each replace `-s` and are mutually exclusive (a call setting both is refused); the output extension is derived from `format`; model files are checked before spawning; success is read from stderr, not the exit code.
 
-HTTP routes beyond the contract's: `api/assets` (the asset surface, see `model-assets.md`) and the panel's job API with a chunked progress stream.
+Built (#5): `GET api/status` → `{version, platform, engine_staged, engine_path, licenses_present, data_dir}`, which the panel renders; `GET /module.json` read from the file; `--selfcheck` (the manifest's `verify`) checks `module.json`, `static/index.html` and `licenses/models.json` exist.
+
+Planned routes beyond the contract's: `api/assets` (the asset surface, see `model-assets.md`) and the panel's job API with a chunked progress stream.
+
+**SDK limit:** `hollowdeck-module` routes match exact paths only, so `GET/DELETE api/assets/{id}` needs this module to run its own accept loop (reusing the SDK's `http::read_request` and `Module::refuse` for the guard, as INTEROP.md allows) or a prefix-routing addition to the SDK.
 
 ## Data crossing the boundary
 
