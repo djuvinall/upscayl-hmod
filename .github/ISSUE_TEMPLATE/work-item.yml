@@ -1,0 +1,37 @@
+# Issue form for a unit of work. Installed by project:initialization as
+# .github/ISSUE_TEMPLATE/work-item.yml. Mirrors what project:issues-write produces, so
+# hand-filed and agent-filed issues read the same.
+name: Work item
+description: A unit of work someone could claim and finish on its own.
+labels: ["status:draft"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What is true when this is done.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why now
+      description: What this unblocks, or what breaks without it.
+  - type: textarea
+    id: approach
+    attributes:
+      label: Approach
+      description: The shape of the work, not a line-by-line script.
+  - type: textarea
+    id: done
+    attributes:
+      label: Done when
+      description: Checkable conditions, ideally commands. The PR is ready when every box is ticked.
+      value: "- [ ] "
+    validations:
+      required: true
+  - type: textarea
+    id: out
+    attributes:
+      label: Out of scope
+      description: Adjacent work this deliberately does not do.
