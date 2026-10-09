@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "updated": "2026-10-08",
+  "source": "docs/results/model-licenses.md",
+  "models": [
+    {
+      "name": "upscayl-standard-4x",
+      "source_dir": "resources/models",
+      "native_scale": 4,
+      "original_name": "RealESRGAN_x4plus",
+      "source_url": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth",
+      "license": "BSD-3-Clause",
+      "license_url": "https://github.com/xinntao/Real-ESRGAN/blob/master/LICENSE",
+      "license_file": "licenses/BSD-3-Clause-Real-ESRGAN.txt",
+      "author": "Xintao Wang (xinntao)",
+      "commercial_use": "allowed",
+      "attribution": "Real-ESRGAN by Xintao Wang, BSD 3-Clause License.",
+      "evidence": [
+        "https://github.com/upscayl/upscayl/commit/6cfaf45",
+        "https://github.com/xinntao/Real-ESRGAN/blob/master/LICENSE",
+        "https://github.com/OpenModelDB/open-model-database/blob/main/data/models/4x-realesrgan-x4plus.json"
+      ],
+      "confidence": "high",
+      "notes": "Renamed from realesrgan-x4plus at 100% similarity in upstream 6cfaf45."
+    },
+    {
+      "name": "upscayl-lite-4x",
+      "source_dir": "resources/models",
+      "native_scale": 4,
+      "original_name": "realesr-general-x4v3",
+      "source_url": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-general-x4v3.pth",
+      "license": "BSD-3-Clause",
+      "license_url": "https://github.com/xinntao/Real-ESRGAN/blob/master/LICENSE",
+      "license_file": "licenses/BSD-3-Clause-Real-ESRGAN.txt",
+      "author": "Xintao Wang (xinntao)",
+      "commercial_use": "allowed",
+      "attribution": "Real-ESRGAN by Xintao Wang, BSD 3-Clause License.",
+      "evidence": [
+        "https://github.com/upscayl/upscayl/commit/801755c",
+        "https://github.com/upscayl/upscayl/commit/6cfaf45",
+        "https://github.com/upscayl/custom-models/blob/main/README.md",
+        "https://github.com/OpenModelDB/open-model-database/blob/main/data/models/4x-realesr-general-x4v3.json"
+      ],
+      "confidence": "high",
+      "notes": "Renamed RealESRGAN_General_x4_v3 -> realesrgan-x4fast -> upscayl-lite-4x, each at 100% similarity; blob identical to upscayl/custom-models RealESRGAN_General_x4_v3.bin."
+    },
+    {
+      "name": "high-fidelity-4x",
+      "source_dir": "resources/models",
+      "native_scale": 4,
+      "original_name": "4xHFA2k",
+      "source_url": "https://github.com/Phhofm/models/tree/main/4xHFA2k",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_file": "licenses/CC-BY-4.0.txt",
+      "author": "Helaman (Phhofm)",
+      "commercial_use": "allowed",
+      "attribution": "4xHFA2k by Helaman (Phhofm), CC BY 4.0, https://github.com/Phhofm/models",
+      "evidence": [
+        "https://github.com/Phhofm/models/blob/main/4xHFA2k/README.md",
+        "https://openmodeldb.info/models/4x-HFA2k",
+        "https://github.com/upscayl/upscayl/blob/main/README.md"
+      ],
+      "confidence": "high",
+      "notes": "Author's README states CC BY 4.0. Attribution is required wherever the model is redistributed or its output credited."
+    },
+    {
+      "name": "remacri-4x",
+      "source_dir": "resources/models",
+      "native_scale": 4,
+      "original_name": "4x_foolhardy_Remacri",
+      "source_url": "https://openmodeldb.info/models/4x-Remacri",
+      "author": "FoolhardyVEVO",
+      "attribution": "4x_foolhardy_Remacri by FoolhardyVEVO, CC BY-NC-SA 4.0",
+      "license": "CC-BY-NC-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "license_file": "licenses/CC-BY-NC-SA-4.0.txt",
+      "commercial_use": "forbidden",
+      "evidence": [
+        "https://openmodeldb.info/models/4x-Remacri",
+        "https://github.com/OpenModelDB/open-model-database/blob/main/data/models/4x-Remacri.json",
+        "https://github.com/upscayl/upscayl/blob/main/renderer/locales/en.json"
+      ],
+      "confidence": "medium",
+      "notes": "OpenModelDB lists CC-BY-NC-SA-4.0 and Upscayl labels it Non-Commercial; no statement from the author could be reached (upscale.wiki unreachable)."
+    },
+    {
+      "name": "ultramix-balanced-4x",
+      "source_dir": "resources/models",
+      "native_scale": 4,
+      "original_name": "4x-UltraMix_Balanced",
+      "source_url": "https://huggingface.co/Kim2091/UltraSharp/blob/main/Interpolations/4x-UltraMix_Balanced.pth",
+      "author": "Kim2091",
+      "attribution": "4x-UltraMix_Balanced by Kim2091, CC BY-NC-SA 4.0, https://huggingface.co/Kim2091/UltraSharp",
+      "license": "CC-BY-NC-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "license_file": "licenses/CC-BY-NC-SA-4.0.txt",
+      "commercial_use": "forbidden",
+      "evidence": [
+        "https://huggingface.co/Kim2091/UltraSharp",
+        "https://github.com/upscayl/upscayl/blob/main/renderer/locales/en.json"
+      ],
+      "confidence": "medium",
+      "notes": "License is the author's repo-level CC BY-NC-SA 4.0; no per-file statement. An interpolation of UltraSharp with other models, whose terms may also apply."
+    },
+    {
+      "name": "ultrasharp-4x",
+      "source_dir": "resources/models",
+      "native_scale": 4,
+      "original_name": "4x-UltraSharp (v1)",
+      "source_url": "https://huggingface.co/Kim2091/UltraSharp",
+      "author": "Kim2091",
+      "attribution": "4x-UltraSharp by Kim2091, CC BY-NC-SA 4.0, https://huggingface.co/Kim2091/UltraSharp",
+      "license": "CC-BY-NC-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "license_file": "licenses/CC-BY-NC-SA-4.0.txt",
+      "commercial_use": "forbidden",
+      "evidence": [
+        "https://huggingface.co/Kim2091/UltraSharp",
+        "https://openmodeldb.info/models/4x-UltraSharp",
+        "https://github.com/upscayl/upscayl/blob/main/renderer/locales/en.json"
+      ],
+      "confidence": "high",
+      "notes": "Author's README states CC BY-NC-SA 4.0; OpenModelDB agrees."
+    },
+    {
+      "name": "digital-art-4x",
+      "source_dir": "resources/models",
+      "native_scale": 4,
+      "original_name": "RealESRGAN_x4plus_anime_6B",
+      "source_url": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.2.4/RealESRGAN_x4plus_anime_6B.pth",
+      "license": "BSD-3-Clause",
+      "license_url": "https://github.com/xinntao/Real-ESRGAN/blob/master/LICENSE",
+      "license_file": "licenses/BSD-3-Clause-Real-ESRGAN.txt",
+      "author": "Xintao Wang (xinntao)",
+      "commercial_use": "allowed",
+      "attribution": "Real-ESRGAN by Xintao Wang, BSD 3-Clause License.",
+      "evidence": [
+        "https://github.com/upscayl/upscayl/commit/6cfaf45",
+        "https://github.com/OpenModelDB/open-model-database/blob/main/data/models/4x-realesrgan-x4plus-anime-6b.json"
+      ],
+      "confidence": "high",
+      "notes": "Renamed from realesrgan-x4plus-anime at 100% similarity in upstream 6cfaf45."
+    },
+    {
+      "name": "realesr-animevideov3-x2",
+      "source_dir": "models",
+      "native_scale": 2,
+      "original_name": "realesr-animevideov3",
+      "source_url": "https://github.com/xinntao/Real-ESRGAN/blob/master/docs/anime_video_model.md",
+      "license": "BSD-3-Clause",
+      "license_url": "https://github.com/xinntao/Real-ESRGAN/blob/master/LICENSE",
+      "license_file": "licenses/BSD-3-Clause-Real-ESRGAN.txt",
+      "author": "Xintao Wang (xinntao)",
+      "commercial_use": "allowed",
+      "attribution": "Real-ESRGAN by Xintao Wang, BSD 3-Clause License.",
+      "evidence": [
+        "https://github.com/xinntao/Real-ESRGAN/blob/master/docs/anime_video_model.md",
+        "https://github.com/OpenModelDB/open-model-database/blob/main/data/models/4x-realesr-animevideo-v3.json",
+        "https://github.com/upscayl/custom-models/blob/main/README.md"
+      ],
+      "confidence": "medium",
+      "notes": "BSD-3-Clause per the model repository and OpenModelDB; the NCNN conversion ships from Real-ESRGAN-ncnn-vulkan (MIT). Both allow commercial use. Upstream does not package these in its app."
+    },
+    {
+      "name": "realesr-animevideov3-x3",
+      "source_dir": "models",
+      "native_scale": 3,
+      "original_name": "realesr-animevideov3",
+      "source_url": "https://github.com/xinntao/Real-ESRGAN/blob/master/docs/anime_video_model.md",
+      "license": "BSD-3-Clause",
+      "license_url": "https://github.com/xinntao/Real-ESRGAN/blob/master/LICENSE",
+      "license_file": "licenses/BSD-3-Clause-Real-ESRGAN.txt",
+      "author": "Xintao Wang (xinntao)",
+      "commercial_use": "allowed",
+      "attribution": "Real-ESRGAN by Xintao Wang, BSD 3-Clause License.",
+      "evidence": [
+        "https://github.com/xinntao/Real-ESRGAN/blob/master/docs/anime_video_model.md",
+        "https://github.com/OpenModelDB/open-model-database/blob/main/data/models/4x-realesr-animevideo-v3.json",
+        "https://github.com/upscayl/custom-models/blob/main/README.md"
+      ],
+      "confidence": "medium",
+      "notes": "BSD-3-Clause per the model repository and OpenModelDB; the NCNN conversion ships from Real-ESRGAN-ncnn-vulkan (MIT). Both allow commercial use. Upstream does not package these in its app."
+    },
+    {
+      "name": "realesr-animevideov3-x4",
+      "source_dir": "models",
+      "native_scale": 4,
+      "original_name": "realesr-animevideov3",
+      "source_url": "https://github.com/xinntao/Real-ESRGAN/blob/master/docs/anime_video_model.md",
+      "license": "BSD-3-Clause",
+      "license_url": "https://github.com/xinntao/Real-ESRGAN/blob/master/LICENSE",
+      "license_file": "licenses/BSD-3-Clause-Real-ESRGAN.txt",
+      "author": "Xintao Wang (xinntao)",
+      "commercial_use": "allowed",
+      "attribution": "Real-ESRGAN by Xintao Wang, BSD 3-Clause License.",
+      "evidence": [
+        "https://github.com/xinntao/Real-ESRGAN/blob/master/docs/anime_video_model.md",
+        "https://github.com/OpenModelDB/open-model-database/blob/main/data/models/4x-realesr-animevideo-v3.json",
+        "https://github.com/upscayl/custom-models/blob/main/README.md"
+      ],
+      "confidence": "medium",
+      "notes": "BSD-3-Clause per the model repository and OpenModelDB; the NCNN conversion ships from Real-ESRGAN-ncnn-vulkan (MIT). Both allow commercial use. Upstream does not package these in its app."
+    }
+  ]
+}

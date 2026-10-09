@@ -32,8 +32,9 @@ Flat scalars, because `properties` takes JSON scalars only:
 | `source_url` | where the model came from | required |
 | `author` | model author as credited | required when known |
 | `commercial_use` | `allowed` / `forbidden` / `unknown` | derived from the license, shown in the UI |
+| `attribution` | `4xHFA2k by Helaman (Phhofm), CC BY 4.0, …` | the credit line to show; required for CC BY models |
 
-The bundled set's records live in one file the module ships (`licenses/models.json`); the sync script refuses to stage a model with no entry. Every engine run logs the model token and its `license` to the event log.
+The bundled set's records live in one file the module ships (`modules/upscayl/licenses/models.json`, researched in `docs/results/model-licenses.md`), which also carries each model's `source_dir`, `native_scale`, `original_name`, `evidence` URLs and `confidence`. The sync script refuses to stage a model with no entry. Every engine run logs the model token and its `license` to the event log.
 
 ## Invariants
 
@@ -42,5 +43,4 @@ The bundled set's records live in one file the module ships (`licenses/models.js
 
 ## Known unknowns
 
-- Every bundled model's actual license (research issue).
 - Whether the Asset Library view shows `properties` well enough to surface a license, or the panel must.
