@@ -521,6 +521,175 @@
           "A scheduled pass over a drop folder"
         ]
       }
+    },
+    {
+      "id": "import_model",
+      "title": "Import model",
+      "category": "models",
+      "description": "Copy an NCNN model (.param with its .bin) into this module and publish it as an ncnn_model asset carrying the license you state. Its token then works in custom_model, and an Asset node can pick it from the Library.",
+      "inputs": [
+        {
+          "name": "param",
+          "type": "str",
+          "description": "The model's .param file; its .bin must sit beside it.",
+          "widget": "path",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "str",
+          "description": "A display name. Empty: the file's name.",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "model_scale",
+          "type": "int",
+          "description": "The model's native scale. 0 reads it from the name (x2/2x is 2, x3/3x is 3, else 4).",
+          "widget": "int",
+          "default": 0,
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "required": false,
+          "label": "model scale"
+        },
+        {
+          "name": "license",
+          "type": "str",
+          "description": "Its license, as an SPDX id (CC-BY-NC-SA-4.0, MIT, ...). Empty records it as unknown.",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "license_url",
+          "type": "str",
+          "description": "Where the license is stated.",
+          "widget": "string",
+          "default": "",
+          "required": false,
+          "label": "license URL"
+        },
+        {
+          "name": "source_url",
+          "type": "str",
+          "description": "Where the model came from.",
+          "widget": "string",
+          "default": "",
+          "required": false,
+          "label": "source URL"
+        },
+        {
+          "name": "author",
+          "type": "str",
+          "description": "Who made it.",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "commercial_use",
+          "type": "str",
+          "description": "Whether its license allows commercial use.",
+          "widget": "select",
+          "options": [
+            "unknown",
+            "allowed",
+            "forbidden"
+          ],
+          "default": "unknown",
+          "required": false,
+          "label": "commercial use"
+        },
+        {
+          "name": "attribution",
+          "type": "str",
+          "description": "The credit line to show, if its license requires one.",
+          "widget": "string",
+          "default": "",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "str",
+          "description": "Its model token, upscayl:imported/<id>, for custom_model."
+        },
+        {
+          "name": "asset_id",
+          "type": "str",
+          "description": "Its asset id in the Library."
+        },
+        {
+          "name": "name",
+          "type": "str",
+          "description": "Its display name."
+        },
+        {
+          "name": "license",
+          "type": "str",
+          "description": "The license recorded."
+        }
+      ],
+      "effects": "writes",
+      "calls_model": false,
+      "doc": {
+        "what": "Adds a custom NCNN model to the module as a licensed asset.",
+        "how": "Checks the .param and .bin exist, copies both into the module's data folder under imported/<id>/models (the engine only loads from a folder named models), and writes an ncnn_model asset with the license fields as properties. Deleting the asset removes the files.",
+        "why": "Custom models travel with their license, like the bundled ones.",
+        "best_uses": [
+          "Adding a model converted from a .pth with chaiNNer",
+          "Keeping a licensed model library for graphs"
+        ]
+      }
+    },
+    {
+      "id": "list_models",
+      "title": "List models",
+      "category": "models",
+      "description": "Every model this module can run, bundled and imported, with its license.",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "models",
+          "type": "list[str]",
+          "description": "Model tokens, for custom_model."
+        },
+        {
+          "name": "names",
+          "type": "list[str]",
+          "description": "Display names, in the same order."
+        },
+        {
+          "name": "licenses",
+          "type": "list[str]",
+          "description": "Licenses, in the same order."
+        },
+        {
+          "name": "commercial_use",
+          "type": "list[str]",
+          "description": "allowed, forbidden or unknown, in the same order."
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "description": "How many."
+        }
+      ],
+      "effects": "reads",
+      "calls_model": false,
+      "doc": {
+        "what": "Lists the models and their licenses.",
+        "how": "Reads licenses/models.json and the imported model assets. Starts nothing.",
+        "why": "So a graph can choose or check a model by license.",
+        "best_uses": [
+          "Picking a commercial-safe model in a graph",
+          "Auditing which models are installed"
+        ]
+      }
     }
   ]
 }

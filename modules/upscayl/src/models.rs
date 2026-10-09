@@ -81,9 +81,26 @@ pub fn resolve_model(
         if let Some(name) = rest.strip_prefix("bundled/") {
             return resolve_bundled(ctx, name, model_scale);
         }
+        if let Some(id) = rest.strip_prefix("imported/") {
+            let (dir, name, scale, license) = crate::assets::imported(ctx, id)?;
+            for ext in ["param", "bin"] {
+                if !dir.join(format!("{name}.{ext}")).is_file() {
+                    return Err(format!(
+                        "imported model '{id}' is missing {name}.{ext}; import it again"
+                    ));
+                }
+            }
+            return Ok(Resolved {
+                dir,
+                native_scale: if model_scale > 0 { model_scale } else { scale },
+                license,
+                label: custom.to_string(),
+                name,
+            });
+        }
         return Err(format!(
             "custom_model \"{custom}\" is a model token this module does not know. Bundled \
-             models are upscayl:bundled/<name>; imported models arrive with model assets"
+             models are upscayl:bundled/<name>, imported ones upscayl:imported/<id>"
         ));
     }
     let param = resolve::resolve(base, custom, "custom_model")?;

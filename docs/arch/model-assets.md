@@ -1,12 +1,14 @@
-# model-assets (planned)
+# model-assets (built, #12)
 
 **Responsibility:** make every NCNN model — bundled or imported — a HollowDeck asset owned by the `upscayl` module, so a graph can pick one with an Asset node and wire it into `custom_model`, and so every model's license travels with it.
 
-Intent as of 2026-10-08 (`decisions.md`). The envelope is HollowDeck's (`docs/arch/assets.md` in both HollowDeck and Orchestrator); this file only says how this module fills it.
+Built in #12. The envelope is HollowDeck's (`docs/arch/assets.md` in both HollowDeck and Orchestrator); this file only says how this module fills it.
 
 ## Public interface
 
-The standard asset surface on relative URLs: `GET/POST api/assets`, `GET/DELETE api/assets/{id}`. The Rust SDK has no asset helper, so the module implements these four routes; a test validates the module's records against HollowDeck's vendored `assets.py` so the two shapes cannot drift.
+The standard asset surface on relative URLs: `GET api/assets` → `{owner, assets: [summary], broken}`, `POST api/assets` → `201 {asset}`, `GET api/assets/{id}` → `{asset}`, `DELETE api/assets/{id}` → `{ok, id}`. The SDK matches exact paths only, so `src/server.rs` runs the module's own accept loop: the SDK's guard (`Module::refuse`) on every request, the two `{id}` routes, then `Module::answer` for everything else. `vendor/assets.py` is HollowDeck's file carried verbatim (byte-compare test), and a test loads every record this module serves through its `Asset.from_dict` and checks it round-trips unchanged. `POST api/assets` normalises a body the way `Asset.from_dict` does.
+
+Bundled models are derived from `licenses/models.json` on each read (ids `bundled-<name>`, never stored, delete answers 409) and carry `staged` in `properties`. Imported models are stored as `<data dir>/assets/<id>.json` with their files in `<data dir>/imported/<id>/models/`; deleting the asset deletes the files. Tools: `import_model` (`writes`) and `list_models` (`reads`).
 
 ## Data crossing the boundary
 
@@ -43,4 +45,4 @@ The bundled set's records live in one file the module ships (`modules/upscayl/li
 
 ## Known unknowns
 
-- Whether the Asset Library view shows `properties` well enough to surface a license, or the panel must.
+- The Asset Library view lists the models (checked 2026-10-08) but does **not** render `properties`, so a model's license is not visible there; the module's panel (#14) must show it.
