@@ -6,7 +6,12 @@
 
 use hollowdeck_module::{json::Value, Module, ModuleContext, Request, Response};
 
+mod args;
+mod engine;
+mod models;
 mod paths;
+mod resolve;
+mod upscale;
 
 fn main() -> Result<(), String> {
     let ctx = ModuleContext::from_env()?;
@@ -26,6 +31,7 @@ fn main() -> Result<(), String> {
 fn build(ctx: ModuleContext) -> Module {
     Module::new(ctx)
         .get("/api/status", status)
+        .tool("upscale_image", upscale::handle)
         .get("/module.json", |_req, ctx| {
             match std::fs::read(ctx.module_path("module.json")) {
                 Ok(bytes) => Response::new(200, "application/json", bytes),
@@ -159,6 +165,28 @@ mod tests {
         assert!(String::from_utf8_lossy(&manifest.body).contains("\"id\": \"upscayl\""));
         let panel = m.answer(&get("/", &host), PORT);
         assert_eq!(panel.status, 200);
+    }
+
+    /// `resolve.rs` is HollowDeck's reference path resolver carried verbatim
+    /// (INTEROP.md section 12: what a relative path means may not have two
+    /// implementations). Compared when the sibling checkout is present; line endings are
+    /// normalised because each checkout's git decides those.
+    #[test]
+    fn the_path_resolver_is_still_the_reference_copy() {
+        let ours = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("src/resolve.rs");
+        let reference = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../HollowDeck/core_modules/system/src/tools/paths.rs");
+        let Ok(theirs) = std::fs::read(&reference) else {
+            eprintln!("skipped: no HollowDeck checkout at {}", reference.display());
+            return;
+        };
+        let norm = |b: Vec<u8>| b.into_iter().filter(|c| *c != b'\r').collect::<Vec<u8>>();
+        let mine = norm(std::fs::read(ours).expect("resolve.rs"));
+        assert!(
+            mine == norm(theirs),
+            "src/resolve.rs has drifted from {}; copy it again",
+            reference.display()
+        );
     }
 
     #[test]

@@ -10,7 +10,7 @@ Tools in `module.json` (node types `upscayl/<id>`). Ids and socket names are per
 
 | Tool | Does | `effects` |
 |---|---|---|
-| `upscale_image` | one image, synchronous, honours the tool timeout | `writes` (open question: `executes`, since it runs a bundled binary) |
+| `upscale_image` | one image, synchronous; **built (#9)** | `writes` (decided: the effect a person sees is a written file; the binary it runs is fixed, not caller-chosen) |
 | `upscale_batch` | a directory, synchronous | `writes` |
 | `start_job` / `job_status` / `wait_job` / `cancel_job` | asynchronous form of the above (see `jobs.md`) | `writes` / `reads` / `reads` / `writes` |
 | `list_models` | bundled + imported models with their licenses | `reads` |
@@ -19,6 +19,8 @@ Tools in `module.json` (node types `upscayl/<id>`). Ids and socket names are per
 Inputs shared by the upscale tools (one socket per GUI setting and CLI flag): `input` (path), `output` (path, optional), `model` (`select` of the bundled models), `custom_model` (`str`, overrides `model` when non-empty: a `.param` path or a model token from an asset), `model_scale` (`-z`), `scale` (`-s`, 1–16), `width` (`-w`), `resize` (`-r`, `WxH`), `resize_filter`, `format`, `compression` (WebP only), `gpu_id`, `tile_size`, `threads` (`-j`), `tta`, `double_upscayl`, `copy_metadata`, `overwrite`.
 
 Argument rules, from `docs/results/engine-probe.md`: `-z` and `-s` are always sent; `width` and `resize` each replace `-s` and are mutually exclusive (a call setting both is refused); the output extension is derived from `format`; model files are checked before spawning; success is read from stderr, not the exit code.
+
+Built (#9): `POST tools/upscale_image`. Outputs `output`, `width`, `height`, `elapsed_ms`, `model` (token or `.param` path), `license`. Refusals: 400 for a bad input (naming the socket), 409 for an existing output with `overwrite` off, 503 when the engine is not staged, 500 for an engine failure (its `Error:` sentence), 504 when the run passes the call budget (280 s, `UPSCAYL_TOOL_BUDGET_SECS`). One `upscayl.upscaled` / `upscayl.failed` event-log line per run with model, license and the full argv.
 
 Built (#5): `GET api/status` → `{version, platform, engine_staged, engine_path, licenses_present, data_dir}`, which the panel renders; `GET /module.json` read from the file; `--selfcheck` (the manifest's `verify`) checks `module.json`, `static/index.html` and `licenses/models.json` exist.
 

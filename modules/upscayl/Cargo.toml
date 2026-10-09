@@ -18,6 +18,10 @@ description = "HollowDeck module driving Upscayl's upscayl-bin engine as Orchest
 # (F:\localRepositories\upscayl-hmod and F:\localRepositories\HollowDeck on Devon's
 # machine). See CLAUDE.md, Environment.
 hollowdeck-module = { path = "../../../HollowDeck/crates/hollowdeck-module" }
+# The SDK deliberately reads no JSON; a tool with real inputs brings its own parser.
+serde_json = "1"
+# Output dimensions from the file header, without decoding the image.
+imagesize = "0.13"
 
 [lints.rust]
 unsafe_code = "deny"

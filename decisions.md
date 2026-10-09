@@ -2,6 +2,22 @@
 
 Newest first. Entries separated by `---`.
 
+## 2026-10-08 — upscale_image: effects writes, a 280 s budget, custom models stay in place
+
+Built in #9. Three calls the issue left open:
+
+**`effects: writes`.** What a person sees the node do is write a file. It does run a binary, but a fixed one the module ships, with arguments the module builds; `executes` would tell a graph author it runs arbitrary commands, which it cannot.
+
+**A 280 s budget per call**, below the Orchestrator's 300 s default, so a long run fails with a sentence naming `start_job` rather than the caller timing out with none. `UPSCAYL_TOOL_BUDGET_SECS` overrides it.
+
+**A custom `.param` must already sit in a folder named `models`.** The engine refuses any other folder name (engine probe, finding 8). Copying the pair into a temporary `models` folder on each call was the alternative.
+
+**Rejected — copy custom models into a temporary `models` folder per call.** Invisible to the user, but copies up to ~32 MB per run and hides a rule the user will meet anyway when importing; imported models (#12) are stored in a `models` folder by design.
+
+**Consequence:** the refusal names the rule and the fix. Upstream's scale omission is not ported: `-z` and `-s` are always sent.
+
+---
+
 ## 2026-10-08 — CI is deferred until the SDK question is answered
 
 The module will build against `hollowdeck-module`, which lives in the private `djuvinall/HollowDeck` repo and is not on crates.io. This repo is public.

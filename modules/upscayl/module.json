@@ -4,20 +4,260 @@
   "version": "0.1.0",
   "description": "Upscale images with Upscayl's engine (upscayl-bin, NCNN on Vulkan) from Orchestrator graphs or this panel. Bundled and imported models are assets that carry their own licenses.",
   "kind": "process",
-  "command": ["{bin:upscayl}"],
-  "verify": ["{bin:upscayl}", "--selfcheck"],
+  "command": [
+    "{bin:upscayl}"
+  ],
+  "verify": [
+    "{bin:upscayl}",
+    "--selfcheck"
+  ],
   "panels": [
-    {"id": "main", "title": "Upscayl", "path": ""}
+    {
+      "id": "main",
+      "title": "Upscayl",
+      "path": ""
+    }
   ],
   "requires": [],
   "depends": {},
   "accepts": [],
   "license": "AGPL-3.0-only",
-  "authors": ["Devon Juvinall"],
+  "authors": [
+    "Devon Juvinall"
+  ],
   "homepage": "https://github.com/djuvinall/upscayl-hmod",
-  "keywords": ["upscale", "image", "super-resolution", "ncnn", "real-esrgan"],
+  "keywords": [
+    "upscale",
+    "image",
+    "super-resolution",
+    "ncnn",
+    "real-esrgan"
+  ],
   "enabled_by_default": true,
   "provenance": "custom",
   "function": "panel",
-  "api_version": 1
+  "api_version": 1,
+  "tools": [
+    {
+      "id": "upscale_image",
+      "title": "Upscale image",
+      "category": "image",
+      "description": "Upscale one image with Upscayl's engine (upscayl-bin). Every Upscayl setting and every engine flag is a socket. Stops after about 280 s; use start_job for longer work.",
+      "inputs": [
+        {
+          "name": "input",
+          "type": "str",
+          "description": "The image to upscale: a PNG, JPEG or WebP file. A relative path is relative to the open project's folder.",
+          "widget": "path",
+          "required": true
+        },
+        {
+          "name": "output",
+          "type": "str",
+          "description": "Where to write the result. Empty: beside the input, named like upstream (photo_upscayl_4x_<model>.png). A folder (ending in / or existing): inside it with that name. A file: exactly there, and its extension must match format.",
+          "widget": "path",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "model",
+          "type": "str",
+          "description": "A bundled model. Overridden by custom_model when that is set. Non-commercial models (Remacri, Ultramix, Ultrasharp) are CC BY-NC-SA 4.0.",
+          "widget": "select",
+          "options": [
+            "upscayl-standard-4x",
+            "upscayl-lite-4x",
+            "high-fidelity-4x",
+            "remacri-4x",
+            "ultramix-balanced-4x",
+            "ultrasharp-4x",
+            "digital-art-4x",
+            "realesr-animevideov3-x2",
+            "realesr-animevideov3-x3",
+            "realesr-animevideov3-x4"
+          ],
+          "default": "upscayl-standard-4x",
+          "required": false
+        },
+        {
+          "name": "custom_model",
+          "type": "str",
+          "description": "Overrides model: a .param file (its .bin beside it, both in a folder named models), or a model token from a model asset (upscayl:bundled/<name>).",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "model_scale",
+          "type": "int",
+          "description": "The model's native scale, sent as -z. 0 reads it from the name (x2/2x is 2, x3/3x is 3, else 4). A wrong value corrupts the output.",
+          "widget": "int",
+          "default": 0,
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "required": false,
+          "label": "model scale"
+        },
+        {
+          "name": "scale",
+          "type": "int",
+          "description": "Output scale, 1 to 16. Ignored when width or resize is set.",
+          "widget": "int",
+          "default": 4,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "required": false
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "description": "Resize to this width in pixels, keeping aspect. 0 means unset. Cannot be combined with resize.",
+          "widget": "int",
+          "default": 0,
+          "min": 0,
+          "step": 1,
+          "required": false
+        },
+        {
+          "name": "resize",
+          "type": "str",
+          "description": "Resize to exact dimensions, WIDTHxHEIGHT (1920x1080); aspect is not kept. Empty means unset. Cannot be combined with width.",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "resize_filter",
+          "type": "str",
+          "description": "The filter for width or resize.",
+          "widget": "select",
+          "options": [
+            "default",
+            "box",
+            "triangle",
+            "cubicbspline",
+            "catmullrom",
+            "mitchell",
+            "pointsample"
+          ],
+          "default": "default",
+          "required": false,
+          "label": "resize filter"
+        },
+        {
+          "name": "format",
+          "type": "str",
+          "description": "Output format.",
+          "widget": "select",
+          "options": [
+            "png",
+            "jpg",
+            "webp"
+          ],
+          "default": "png",
+          "required": false
+        },
+        {
+          "name": "compression",
+          "type": "int",
+          "description": "WebP only: 0 to 100, higher is smaller and lossier. PNG and JPEG ignore it.",
+          "widget": "int",
+          "default": 0,
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "required": false
+        },
+        {
+          "name": "gpu_id",
+          "type": "str",
+          "description": "The GPU to use: empty for automatic, a number (0), or several (0,1).",
+          "widget": "string",
+          "default": "",
+          "required": false,
+          "label": "GPU"
+        },
+        {
+          "name": "tile_size",
+          "type": "str",
+          "description": "Tile size: 0 for automatic, or 32 and up; one per GPU (0,0). Smaller uses less VRAM and is slower.",
+          "widget": "string",
+          "default": "0",
+          "required": false,
+          "label": "tile size"
+        },
+        {
+          "name": "threads",
+          "type": "str",
+          "description": "Thread counts as load:proc:save, like 1:2:2. Empty for the engine's default.",
+          "widget": "string",
+          "default": "",
+          "required": false
+        },
+        {
+          "name": "tta",
+          "type": "bool",
+          "description": "Test-time augmentation: slower, sometimes cleaner.",
+          "widget": "bool",
+          "default": false,
+          "required": false,
+          "label": "TTA"
+        },
+        {
+          "name": "overwrite",
+          "type": "bool",
+          "description": "Replace the output if it already exists. Off: an existing output is refused.",
+          "widget": "bool",
+          "default": false,
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "str",
+          "description": "The path of the upscaled image."
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "description": "Its width in pixels."
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "description": "Its height in pixels."
+        },
+        {
+          "name": "elapsed_ms",
+          "type": "int",
+          "description": "How long the engine ran."
+        },
+        {
+          "name": "model",
+          "type": "str",
+          "description": "The model used: a bundled token or the custom .param path."
+        },
+        {
+          "name": "license",
+          "type": "str",
+          "description": "That model's license (SPDX id), or unrecorded for a custom model."
+        }
+      ],
+      "effects": "writes",
+      "calls_model": false,
+      "doc": {
+        "what": "Upscales one image with an NCNN super-resolution model on the GPU.",
+        "how": "Resolves the input and output paths, checks the model files exist, runs upscayl-bin with -z always matching the model, and reads its stderr for progress and errors. Writes one file. Fails when the input cannot be read, the model is missing or not staged, the output exists and overwrite is off, or the run exceeds about 280 s.",
+        "why": "Upscayl's settings as a node, so a graph can upscale images without the Upscayl app.",
+        "best_uses": [
+          "Upscaling a photo or texture before further processing",
+          "Batch pipelines built from per-image nodes",
+          "Making a sprite or texture larger for a game asset"
+        ]
+      }
+    }
+  ]
 }
