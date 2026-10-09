@@ -34,7 +34,7 @@ Planned routes beyond the contract's: `api/assets` (the asset surface, see `mode
 ## Depends on
 
 - `hollowdeck-module` SDK (path dependency on the sibling HollowDeck checkout).
-- Engine files staged into `modules/upscayl/engine/` (gitignored) by the sync script from upstream's `resources/` and `models/`, plus a bundled `exiftool`.
+- Engine files staged into `modules/upscayl/engine/` (gitignored) by `modules/upscayl/scripts/sync-engine.ps1` (#8): `engine/bin/<win|linux|mac>/`, `engine/models/` (only models whose license is recorded; `-NoNonCommercial` also drops CC BY-NC-SA ones), `engine/exiftool/exiftool.exe` (pinned 13.59, sha256-checked), and `engine/manifest.json` (every file's sha256 and source, the upstream commit, what was skipped). Run it before a hosted test or a pack.
 
 ## Invariants
 
