@@ -1,0 +1,414 @@
+{
+  "machine": {
+    "python": "3.11.9"
+  },
+  "input": {
+    "width": 256,
+    "height": 256,
+    "format": "JPEG",
+    "bytes": 20936
+  },
+  "groups": {
+    "followup": [
+      {
+        "case": "model-dir-named-custom",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\custom.png",
+          "-m",
+          "<work>\\custom",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png"
+        ],
+        "exit": 4294967295,
+        "seconds": 0.014,
+        "stderr_tail": [
+          "🚨 Error: Unknown model dir type. Make sure that the model directory is called 'models' with *.param and *.bin files inside it."
+        ],
+        "output": null
+      },
+      {
+        "case": "model-dir-models-param-only",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\paramonly.png",
+          "-m",
+          "<work>\\half\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png"
+        ],
+        "exit": 3221226505,
+        "seconds": 4.316,
+        "stderr_tail": [
+          "[1 AMD Radeon(TM) Graphics]  fp16-p/s/a=1/1/1  int8-p/s/a=1/1/1",
+          "[1 AMD Radeon(TM) Graphics]  subgroup=64  basic=1  vote=1  ballot=1  shuffle=1",
+          "🚨 Error: Failed to open <repo>\\resources\\win\\bin\\<work>\\half\\models/upscayl-lite-4x.bin"
+        ],
+        "output": null
+      },
+      {
+        "case": "model-dir-relative-models",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\relmodels.png",
+          "-m",
+          "models",
+          "-n",
+          "realesr-animevideov3-x4",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.229,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1478421
+        }
+      },
+      {
+        "case": "gpu-1-igpu",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\g1.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-g",
+          "1",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.779,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1345196
+        }
+      },
+      {
+        "case": "gpu-multi-0-1",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\g01.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-g",
+          "0,1",
+          "-t",
+          "0,0",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.388,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "verbose-auto-gpu",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\verbose.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-v",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.252,
+        "stderr_tail": [
+          "",
+          "🙌 Upscayled Successfully!",
+          "✅ <repo>\\to_upscale.jpeg -> <work>\\verbose.png done"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "resize-w-filter",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\wfilter.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-w",
+          "1000:pointsample",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.283,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1000,
+          "height": 1000,
+          "format": "PNG",
+          "bytes": 1246981
+        }
+      },
+      {
+        "case": "resize-r-filter",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\rfilter.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-r",
+          "800x600:catmullrom",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.165,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 800,
+          "height": 600,
+          "format": "PNG",
+          "bytes": 664841
+        }
+      },
+      {
+        "case": "resize-w-and-r",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\wr.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-w",
+          "1000",
+          "-r",
+          "800x600",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.179,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 800,
+          "height": 800,
+          "format": "PNG",
+          "bytes": 853646
+        }
+      },
+      {
+        "case": "format-from-output-ext",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\byext.webp",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x"
+        ],
+        "exit": 0,
+        "seconds": 1.515,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "WEBP",
+          "bytes": 968172
+        }
+      },
+      {
+        "case": "format-mismatch-ext",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\mismatch.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "jpg"
+        ],
+        "exit": 0,
+        "seconds": 1.225,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "scale-s4-z4-explicit",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\s4z4.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-z",
+          "4",
+          "-s",
+          "4",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.191,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "x2-model-s2-no-z",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\x2s2noz.png",
+          "-m",
+          "<repo>\\models",
+          "-n",
+          "realesr-animevideov3-x2",
+          "-s",
+          "2",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.125,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 512,
+          "height": 512,
+          "format": "PNG",
+          "bytes": 472700
+        }
+      },
+      {
+        "case": "existing-output",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\exists.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.241,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      }
+    ]
+  }
+}

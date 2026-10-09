@@ -19,7 +19,7 @@ None that the module uses. The relevant seams, for porting:
 
 | Feature | What upstream does |
 |---|---|
-| Scale omission | sends `-s` only when it differs from the model's native scale and no custom width is set |
+| Scale omission | sends `-s` only when it differs from the model's native scale and no custom width is set. **Never passes `-z`**, which is safe only for 4x models: a custom 2x/3x model is processed as 4x and comes out corrupted (`docs/results/engine-probe.md`, finding 1). The module does **not** port this rule |
 | Double upscayl | pass 1 without `-c`/`-w`/`-x`; pass 2 runs the output through again with them |
 | Copy metadata | after the run, `exiftool -tagsFromFile <in> -overwrite_original_in_place <out>` (via `exiftool-vendored`) |
 | Output naming | `<name>_upscayl_<scale>x_<model>.<fmt>` or `<width>px` when a custom width is used; `overwrite` setting |
@@ -28,7 +28,7 @@ None that the module uses. The relevant seams, for porting:
 
 ## Invariants
 
-- GUI scale range is 1–16 (`select-image-scale.tsx`), compression 0–100. Whether the engine honours scales outside 2/3/4 is unverified.
+- GUI scale range is 1–16 (`select-image-scale.tsx`), and the engine honours all of it. Compression 0–100 applies to WebP only.
 
 ## Notes
 

@@ -1,0 +1,1277 @@
+{
+  "machine": {
+    "python": "3.11.9"
+  },
+  "input": {
+    "width": 256,
+    "height": 256,
+    "format": "JPEG",
+    "bytes": 20936
+  },
+  "groups": {
+    "scale": [
+      {
+        "case": "scale-s1",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\s1.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-s",
+          "1",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.543,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 256,
+          "height": 256,
+          "format": "PNG",
+          "bytes": 121337
+        }
+      },
+      {
+        "case": "scale-s2",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\s2.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-s",
+          "2",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.346,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 512,
+          "height": 512,
+          "format": "PNG",
+          "bytes": 400370
+        }
+      },
+      {
+        "case": "scale-s3",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\s3.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-s",
+          "3",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.392,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 768,
+          "height": 768,
+          "format": "PNG",
+          "bytes": 797997
+        }
+      },
+      {
+        "case": "scale-s4",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\s4.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-s",
+          "4",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.384,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "scale-s5",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\s5.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-s",
+          "5",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.356,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1280,
+          "height": 1280,
+          "format": "PNG",
+          "bytes": 1889104
+        }
+      },
+      {
+        "case": "scale-s6",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\s6.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-s",
+          "6",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.323,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1536,
+          "height": 1536,
+          "format": "PNG",
+          "bytes": 2495265
+        }
+      },
+      {
+        "case": "scale-s8",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\s8.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-s",
+          "8",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.473,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 2048,
+          "height": 2048,
+          "format": "PNG",
+          "bytes": 3759399
+        }
+      },
+      {
+        "case": "scale-s12",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\s12.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-s",
+          "12",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.606,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 3072,
+          "height": 3072,
+          "format": "PNG",
+          "bytes": 6843357
+        }
+      },
+      {
+        "case": "scale-s16",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\s16.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-s",
+          "16",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.966,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 4096,
+          "height": 4096,
+          "format": "PNG",
+          "bytes": 10700990
+        }
+      },
+      {
+        "case": "scale-none",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\snone.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.218,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      }
+    ],
+    "native": [
+      {
+        "case": "native-x2-no-z",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\x2noz.png",
+          "-m",
+          "<repo>\\models",
+          "-n",
+          "realesr-animevideov3-x2",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.122,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1078118
+        }
+      },
+      {
+        "case": "native-x2-z2",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\x2z2.png",
+          "-m",
+          "<repo>\\models",
+          "-n",
+          "realesr-animevideov3-x2",
+          "-z",
+          "2",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.095,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 512,
+          "height": 512,
+          "format": "PNG",
+          "bytes": 424676
+        }
+      },
+      {
+        "case": "native-x2-z2-s4",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\x2z2s4.png",
+          "-m",
+          "<repo>\\models",
+          "-n",
+          "realesr-animevideov3-x2",
+          "-z",
+          "2",
+          "-s",
+          "4",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.239,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1225199
+        }
+      }
+    ],
+    "resize": [
+      {
+        "case": "resize-w1000",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\w1000.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-w",
+          "1000",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.526,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1000,
+          "height": 1000,
+          "format": "PNG",
+          "bytes": 1246981
+        }
+      },
+      {
+        "case": "resize-r-help",
+        "args": [
+          "-r",
+          "help"
+        ],
+        "exit": 4294967295,
+        "seconds": 0.016,
+        "stderr_tail": [],
+        "output": null
+      },
+      {
+        "case": "resize-r1920x1080",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\r1920.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-r",
+          "1920x1080",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.592,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1920,
+          "height": 1080,
+          "format": "PNG",
+          "bytes": 2183241
+        }
+      },
+      {
+        "case": "resize-w1000-s2",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\w1000s2.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-w",
+          "1000",
+          "-s",
+          "2",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.341,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      }
+    ],
+    "format": [
+      {
+        "case": "format-png-c0",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\fmt-c0.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png",
+          "-c",
+          "0"
+        ],
+        "exit": 0,
+        "seconds": 1.311,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "format-png-c50",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\fmt-c50.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png",
+          "-c",
+          "50"
+        ],
+        "exit": 0,
+        "seconds": 1.378,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "format-png-c100",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\fmt-c100.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png",
+          "-c",
+          "100"
+        ],
+        "exit": 0,
+        "seconds": 1.493,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "format-jpg-c0",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\fmt-c0.jpg",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "jpg",
+          "-c",
+          "0"
+        ],
+        "exit": 0,
+        "seconds": 1.241,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "bytes": 634479
+        }
+      },
+      {
+        "case": "format-jpg-c50",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\fmt-c50.jpg",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "jpg",
+          "-c",
+          "50"
+        ],
+        "exit": 0,
+        "seconds": 1.222,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "bytes": 634479
+        }
+      },
+      {
+        "case": "format-jpg-c100",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\fmt-c100.jpg",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "jpg",
+          "-c",
+          "100"
+        ],
+        "exit": 0,
+        "seconds": 1.244,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "JPEG",
+          "bytes": 634479
+        }
+      },
+      {
+        "case": "format-webp-c0",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\fmt-c0.webp",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "webp",
+          "-c",
+          "0"
+        ],
+        "exit": 0,
+        "seconds": 1.556,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "WEBP",
+          "bytes": 968172
+        }
+      },
+      {
+        "case": "format-webp-c50",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\fmt-c50.webp",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "webp",
+          "-c",
+          "50"
+        ],
+        "exit": 0,
+        "seconds": 1.327,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "WEBP",
+          "bytes": 50028
+        }
+      },
+      {
+        "case": "format-webp-c100",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\fmt-c100.webp",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "webp",
+          "-c",
+          "100"
+        ],
+        "exit": 0,
+        "seconds": 1.234,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "WEBP",
+          "bytes": 13160
+        }
+      }
+    ],
+    "tuning": [
+      {
+        "case": "tile-t0",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\t0.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-t",
+          "0",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.252,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "tile-t32",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\t32.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-t",
+          "32",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.826,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1346470
+        }
+      },
+      {
+        "case": "tile-t256",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\t256.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-t",
+          "256",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.324,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1359497
+        }
+      },
+      {
+        "case": "tta-x",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\tta.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-x",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.822,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1132711
+        }
+      },
+      {
+        "case": "threads-122",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\j122.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-j",
+          "1:2:2",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.559,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "threads-244",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\j244.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-j",
+          "2:4:4",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.474,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "gpu-0",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\g0.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-g",
+          "0",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.322,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "gpu-99",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\g99.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-g",
+          "99",
+          "-f",
+          "png"
+        ],
+        "exit": 4294967295,
+        "seconds": 0.203,
+        "stderr_tail": [
+          "[1 AMD Radeon(TM) Graphics]  fp16-p/s/a=1/1/1  int8-p/s/a=1/1/1",
+          "[1 AMD Radeon(TM) Graphics]  subgroup=64  basic=1  vote=1  ballot=1  shuffle=1",
+          "🚨 Error: Invalid GPU Device"
+        ],
+        "output": null
+      }
+    ],
+    "failure": [
+      {
+        "case": "fail-no-such-model",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\nomodel.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "does-not-exist",
+          "-f",
+          "png"
+        ],
+        "exit": 3221226505,
+        "seconds": 6.658,
+        "stderr_tail": [
+          "[1 AMD Radeon(TM) Graphics]  fp16-p/s/a=1/1/1  int8-p/s/a=1/1/1",
+          "[1 AMD Radeon(TM) Graphics]  subgroup=64  basic=1  vote=1  ballot=1  shuffle=1",
+          "🚨 Error: Failed to open <repo>\\resources\\win\\bin\\<repo>\\resources\\models/does-not-exist.param"
+        ],
+        "output": null
+      },
+      {
+        "case": "fail-missing-bin",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\nobin.png",
+          "-m",
+          "<work>\\halfmodel",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png"
+        ],
+        "exit": 4294967295,
+        "seconds": 0.088,
+        "stderr_tail": [
+          "🚨 Error: Unknown model dir type. Make sure that the model directory is called 'models' with *.param and *.bin files inside it."
+        ],
+        "output": null
+      },
+      {
+        "case": "fail-no-input",
+        "args": [
+          "-i",
+          "<work>\\missing.jpg",
+          "-o",
+          "<work>\\noinput.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.313,
+        "stderr_tail": [
+          "[1 AMD Radeon(TM) Graphics]  fp16-p/s/a=1/1/1  int8-p/s/a=1/1/1",
+          "[1 AMD Radeon(TM) Graphics]  subgroup=64  basic=1  vote=1  ballot=1  shuffle=1",
+          "🚨 Error: Couldn't read the image '<work>\\missing.jpg'!"
+        ],
+        "output": null
+      },
+      {
+        "case": "fail-no-output-dir",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\no\\such\\dir\\out.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.31,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "fail-readonly-output",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\ro\\out.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.221,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      }
+    ],
+    "dir": [
+      {
+        "case": "dir-mode",
+        "args": [
+          "-i",
+          "<work>\\batch-in",
+          "-o",
+          "<work>\\batch-out",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.528,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": null,
+        "output_dir": [
+          [
+            "a.png",
+            {
+              "width": 1024,
+              "height": 1024,
+              "format": "PNG",
+              "bytes": 1357035
+            }
+          ],
+          [
+            "b.png",
+            {
+              "width": 1024,
+              "height": 1024,
+              "format": "PNG",
+              "bytes": 1357035
+            }
+          ]
+        ]
+      }
+    ],
+    "paths": [
+      {
+        "case": "path-spaces",
+        "args": [
+          "-i",
+          "<work>\\with space\\in put.jpeg",
+          "-o",
+          "<work>\\with space\\out put.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.347,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      },
+      {
+        "case": "path-unicode",
+        "args": [
+          "-i",
+          "<work>\\ünïcødé\\图像.jpeg",
+          "-o",
+          "<work>\\ünïcødé\\出力.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "upscayl-lite-4x",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 1.823,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1357035
+        }
+      }
+    ],
+    "progress": [
+      {
+        "case": "progress-tta-ultrasharp",
+        "args": [
+          "-i",
+          "<repo>\\to_upscale.jpeg",
+          "-o",
+          "<work>\\progress.png",
+          "-m",
+          "<repo>\\resources\\models",
+          "-n",
+          "ultrasharp-4x",
+          "-x",
+          "-f",
+          "png"
+        ],
+        "exit": 0,
+        "seconds": 6.695,
+        "stderr_tail": [
+          "100.00",
+          "",
+          "🙌 Upscayled Successfully!"
+        ],
+        "output": {
+          "width": 1024,
+          "height": 1024,
+          "format": "PNG",
+          "bytes": 1474268
+        }
+      }
+    ]
+  }
+}
