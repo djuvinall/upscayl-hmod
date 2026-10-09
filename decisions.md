@@ -2,6 +2,20 @@
 
 Newest first. Entries separated by `---`.
 
+## 2026-10-08 — The module runs its own accept loop, around the SDK's guard
+
+`GET/DELETE api/assets/{id}` is part of the asset surface every owner serves, and the `hollowdeck-module` SDK matches exact paths only.
+
+`src/server.rs` replaces `Module::serve`: it binds `127.0.0.1` on the handed port, reads each request with the SDK's `http::read_request`, refuses through the SDK's `Module::refuse` (both guard modes, unchanged), answers the two `{id}` routes itself, and hands everything else to `Module::answer`.
+
+**Rejected — add prefix routing to the SDK.** The right long-term fix, but it is a change to HollowDeck's crate made from another repo; this keeps the module unblocked and is easy to delete if the SDK grows it.
+
+**Rejected — `api/assets/get?id=`.** The Library and `asset/reference` call `/m/<owner>/api/assets/<id>`; a different spelling would not be an asset owner.
+
+**Consequence:** a future streaming route (job progress) is added in `server.rs`, since `Module::stream` routes are only reachable through `Module::serve`.
+
+---
+
 ## 2026-10-08 — upscale_image: effects writes, a 280 s budget, custom models stay in place
 
 Built in #9. Three calls the issue left open:

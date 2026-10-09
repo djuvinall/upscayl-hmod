@@ -13,8 +13,8 @@ Tools in `module.json` (node types `upscayl/<id>`). Ids and socket names are per
 | `upscale_image` | one image, synchronous; **built (#9)** | `writes` (decided: the effect a person sees is a written file; the binary it runs is fixed, not caller-chosen) |
 | `upscale_batch` | a directory, synchronous; **built (#11)** | `writes` |
 | `start_job` / `job_status` / `wait_job` / `cancel_job` | asynchronous form of the above (see `jobs.md`) | `writes` / `reads` / `reads` / `writes` |
-| `list_models` | bundled + imported models with their licenses | `reads` |
-| `import_model` | copy a `.param`/`.bin` pair into the module's data dir and create its asset | `writes` |
+| `list_models` | bundled + imported models with their licenses; **built (#12)** | `reads` |
+| `import_model` | copy a `.param`/`.bin` pair into the module's data dir and create its asset; **built (#12)** | `writes` |
 
 Inputs shared by the upscale tools (one socket per GUI setting and CLI flag): `input` (path), `output` (path, optional), `model` (`select` of the bundled models), `custom_model` (`str`, overrides `model` when non-empty: a `.param` path or a model token from an asset), `model_scale` (`-z`), `scale` (`-s`, 1–16), `width` (`-w`), `resize` (`-r`, `WxH`), `resize_filter`, `format`, `compression` (WebP only), `gpu_id`, `tile_size`, `threads` (`-j`), `tta`, `double_upscayl`, `copy_metadata`, `overwrite`.
 
@@ -30,7 +30,7 @@ Built (#5): `GET api/status` → `{version, platform, engine_staged, engine_path
 
 Planned routes beyond the contract's: `api/assets` (the asset surface, see `model-assets.md`) and the panel's job API with a chunked progress stream.
 
-**SDK limit:** `hollowdeck-module` routes match exact paths only, so `GET/DELETE api/assets/{id}` needs this module to run its own accept loop (reusing the SDK's `http::read_request` and `Module::refuse` for the guard, as INTEROP.md allows) or a prefix-routing addition to the SDK.
+**SDK limit, handled:** `hollowdeck-module` routes match exact paths only, so `src/server.rs` runs this module's own accept loop for `GET/DELETE api/assets/{id}`: `http::read_request`, `Module::refuse` (the SDK's guard, unchanged), the prefix routes, then `Module::answer`. A streaming route added later goes through this loop too.
 
 ## Data crossing the boundary
 

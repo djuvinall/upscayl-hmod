@@ -7,11 +7,13 @@
 use hollowdeck_module::{json::Value, Module, ModuleContext, Request, Response};
 
 mod args;
+mod assets;
 mod batch;
 mod engine;
 mod models;
 mod paths;
 mod resolve;
+mod server;
 mod upscale;
 
 fn main() -> Result<(), String> {
@@ -25,7 +27,7 @@ fn main() -> Result<(), String> {
         "the Upscayl module is coming up",
         &[("port".to_string(), Value::from(ctx.port))],
     );
-    build(ctx).serve()
+    server::serve(build(ctx), routes())
 }
 
 /// Every route, in one place, so tests can drive the same module the binary serves.
@@ -34,6 +36,10 @@ fn build(ctx: ModuleContext) -> Module {
         .get("/api/status", status)
         .tool("upscale_image", upscale::handle)
         .tool("upscale_batch", batch::handle)
+        .tool("import_model", assets::import_model)
+        .tool("list_models", assets::list_models)
+        .get("/api/assets", assets::list)
+        .post("/api/assets", assets::create)
         .get("/module.json", |_req, ctx| {
             match std::fs::read(ctx.module_path("module.json")) {
                 Ok(bytes) => Response::new(200, "application/json", bytes),
@@ -41,6 +47,23 @@ fn build(ctx: ModuleContext) -> Module {
             }
         })
         .statics("static")
+}
+
+/// The routes with an id in the path, which the SDK cannot match (see `server.rs`).
+fn routes() -> Vec<server::PrefixRoute> {
+    use std::sync::Arc;
+    vec![
+        server::PrefixRoute {
+            method: "GET",
+            prefix: "/api/assets",
+            handler: Arc::new(assets::get),
+        },
+        server::PrefixRoute {
+            method: "DELETE",
+            prefix: "/api/assets",
+            handler: Arc::new(assets::delete),
+        },
+    ]
 }
 
 /// `GET api/status` -- what the panel shows: the module version and whether the engine
@@ -189,6 +212,260 @@ mod tests {
             "src/resolve.rs has drifted from {}; copy it again",
             reference.display()
         );
+    }
+
+    fn answer(m: &Module, req: &Request) -> Response {
+        server::answer(m, &routes(), req, PORT)
+    }
+
+    fn request(method: &str, path: &str, body: &str) -> Request {
+        let mut h = Headers::new();
+        h.push("host", "127.0.0.1:47123");
+        Request {
+            method: method.into(),
+            path: path.into(),
+            query: String::new(),
+            headers: h,
+            body: body.as_bytes().to_vec(),
+        }
+    }
+
+    fn json_of(r: &Response) -> serde_json::Value {
+        serde_json::from_slice(&r.body).unwrap_or(serde_json::Value::Null)
+    }
+
+    fn asset_ctx(name: &str) -> ModuleContext {
+        let mut c = ctx(None);
+        c.data_dir = c.module_dir.join("target/test-data/assets").join(name);
+        let _ = std::fs::remove_dir_all(&c.data_dir);
+        c
+    }
+
+    #[test]
+    fn bundled_models_are_listed_as_licensed_assets_and_cannot_be_deleted() {
+        let m = build(asset_ctx("list"));
+        let r = answer(&m, &request("GET", "/m/upscayl/api/assets", ""));
+        assert_eq!(r.status, 200);
+        let v = json_of(&r);
+        assert_eq!(v["owner"], "upscayl");
+        let list = v["assets"].as_array().unwrap();
+        assert_eq!(list.len(), 10);
+        let us = list
+            .iter()
+            .find(|a| a["id"] == "bundled-ultrasharp-4x")
+            .unwrap();
+        assert_eq!(us["kind"], "ncnn_model");
+        assert_eq!(us["properties"]["license"], "CC-BY-NC-SA-4.0");
+        assert_eq!(us["properties"]["commercial_use"], "forbidden");
+        assert!(us.get("payload").is_none(), "a listing carries no payload");
+        let one = json_of(&answer(
+            &m,
+            &request("GET", "/api/assets/bundled-ultrasharp-4x", ""),
+        ));
+        assert_eq!(
+            one["asset"]["payload"]["outputs"]["model"],
+            "upscayl:bundled/ultrasharp-4x"
+        );
+        let del = answer(
+            &m,
+            &request("DELETE", "/api/assets/bundled-ultrasharp-4x", ""),
+        );
+        assert_eq!(del.status, 409);
+        assert_eq!(
+            answer(&m, &request("GET", "/api/assets/nope", "")).status,
+            404
+        );
+        assert_eq!(
+            answer(&m, &request("GET", "/api/assets/Bad", "")).status,
+            400
+        );
+    }
+
+    #[test]
+    fn a_generic_asset_can_be_created_read_and_deleted() {
+        let m = build(asset_ctx("generic"));
+        let r = answer(
+            &m,
+            &request(
+                "POST",
+                "/api/assets",
+                r#"{"name": "Note", "kind": "note", "payload": {"x": 1}}"#,
+            ),
+        );
+        assert_eq!(r.status, 201, "{}", String::from_utf8_lossy(&r.body));
+        let id = json_of(&r)["asset"]["id"].as_str().unwrap().to_string();
+        assert_eq!(id, "note");
+        assert_eq!(
+            json_of(&answer(
+                &m,
+                &request("GET", &format!("/api/assets/{id}"), "")
+            ))["asset"]["payload"]["x"],
+            1
+        );
+        assert_eq!(
+            answer(&m, &request("DELETE", &format!("/api/assets/{id}"), "")).status,
+            200
+        );
+        assert_eq!(
+            answer(&m, &request("GET", &format!("/api/assets/{id}"), "")).status,
+            404
+        );
+    }
+
+    /// The asset envelope is HollowDeck's (`shared/python/assets.py`), carried verbatim.
+    #[test]
+    fn the_vendored_assets_py_is_still_the_reference_copy() {
+        let ours = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("vendor/assets.py");
+        let reference = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../HollowDeck/shared/python/assets.py");
+        let Ok(theirs) = std::fs::read(&reference) else {
+            eprintln!("skipped: no HollowDeck checkout at {}", reference.display());
+            return;
+        };
+        let norm = |b: Vec<u8>| b.into_iter().filter(|c| *c != b'\r').collect::<Vec<u8>>();
+        assert!(
+            norm(std::fs::read(ours).expect("vendor/assets.py")) == norm(theirs),
+            "vendor/assets.py has drifted from {}",
+            reference.display()
+        );
+    }
+
+    /// Every record this module serves loads through `assets.py`'s own `Asset.from_dict`
+    /// and round-trips unchanged: the envelope has one implementation, and this proves
+    /// the Rust one matches it. Skipped when no Python is on PATH.
+    #[test]
+    fn every_record_round_trips_through_assets_py() {
+        let c = asset_ctx("roundtrip");
+        let m = build(c.clone());
+        let r = answer(
+            &m,
+            &request(
+                "POST",
+                "/api/assets",
+                r#"{"name": "Rec", "kind": "ncnn_model", "tags": ["a"], "properties": {"license": "MIT"}, "payload": {"outputs": {"model": "x"}}}"#,
+            ),
+        );
+        assert_eq!(r.status, 201);
+        let listing = json_of(&answer(&m, &request("GET", "/api/assets", "")));
+        let full: Vec<serde_json::Value> = listing["assets"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|a| {
+                json_of(&answer(
+                    &m,
+                    &request(
+                        "GET",
+                        &format!("/api/assets/{}", a["id"].as_str().unwrap()),
+                        "",
+                    ),
+                ))
+            })
+            .map(|v| v["asset"].clone())
+            .collect();
+        let file = c.data_dir.join("records.json");
+        std::fs::create_dir_all(&c.data_dir).unwrap();
+        std::fs::write(
+            &file,
+            serde_json::to_vec(&serde_json::json!({"summaries": listing["assets"], "full": full}))
+                .unwrap(),
+        )
+        .unwrap();
+        let script = r#"
+import json, sys
+sys.path.insert(0, sys.argv[1])
+from assets import Asset
+d = json.load(open(sys.argv[2], encoding="utf-8"))
+for s in d["summaries"]:
+    got = Asset.from_dict(s).summary()
+    assert got == s, (s["id"], got, s)
+for f in d["full"]:
+    got = Asset.from_dict(f).to_dict()
+    assert got == f, (f["id"], got, f)
+print("ok", len(d["summaries"]), len(d["full"]))
+"#;
+        let vendor = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("vendor");
+        let out = match std::process::Command::new("python")
+            .arg("-c")
+            .arg(script)
+            .arg(&vendor)
+            .arg(&file)
+            .output()
+        {
+            Ok(o) => o,
+            Err(_) => {
+                eprintln!("skipped: no python on PATH");
+                return;
+            }
+        };
+        assert!(
+            out.status.success(),
+            "{}{}",
+            String::from_utf8_lossy(&out.stdout),
+            String::from_utf8_lossy(&out.stderr)
+        );
+        assert!(
+            String::from_utf8_lossy(&out.stdout).starts_with("ok 11 11"),
+            "{}",
+            String::from_utf8_lossy(&out.stdout)
+        );
+    }
+
+    /// Import a model, run it through its token, then delete it and its files.
+    #[test]
+    fn an_imported_model_is_an_asset_its_token_runs_and_delete_removes_its_files() {
+        let c = asset_ctx("import");
+        if !c.module_dir.join(paths::ENGINE_REL).is_file() {
+            eprintln!("skipped: engine not staged");
+            return;
+        }
+        let src = c.data_dir.join("incoming/custom");
+        std::fs::create_dir_all(&src).unwrap();
+        for ext in ["param", "bin"] {
+            std::fs::copy(
+                c.module_dir
+                    .join(format!("engine/models/upscayl-lite-4x.{ext}")),
+                src.join(format!("my-lite-4x.{ext}")),
+            )
+            .unwrap();
+        }
+        let m = build(c.clone());
+        let body = serde_json::json!({"inputs": {"param": src.join("my-lite-4x.param").display().to_string(), "name": "My Lite", "license": "BSD-3-Clause", "commercial_use": "allowed"}, "base_dir": env!("CARGO_MANIFEST_DIR"), "base_dir_source": "project"});
+        let r = answer(
+            &m,
+            &request("POST", "/tools/import_model", &body.to_string()),
+        );
+        assert_eq!(r.status, 200, "{}", String::from_utf8_lossy(&r.body));
+        let o = json_of(&r)["outputs"].clone();
+        assert_eq!(o["model"], "upscayl:imported/my-lite");
+        assert!(c
+            .data_dir
+            .join("imported/my-lite/models/my-lite-4x.bin")
+            .is_file());
+        let listed = json_of(&answer(
+            &m,
+            &request("POST", "/tools/list_models", r#"{"inputs": {}}"#),
+        ));
+        assert_eq!(listed["outputs"]["count"], 11);
+        let out = c.data_dir.join("run/out.png");
+        let up = serde_json::json!({"inputs": {"input": c.module_dir.join("../../to_upscale.jpeg").display().to_string(), "output": out.display().to_string(), "custom_model": "upscayl:imported/my-lite", "scale": 2}, "base_dir": env!("CARGO_MANIFEST_DIR"), "base_dir_source": "project"});
+        let r = answer(
+            &m,
+            &request("POST", "/tools/upscale_image", &up.to_string()),
+        );
+        assert_eq!(r.status, 200, "{}", String::from_utf8_lossy(&r.body));
+        assert_eq!(json_of(&r)["outputs"]["license"], "BSD-3-Clause");
+        assert_eq!(
+            answer(&m, &request("DELETE", "/api/assets/my-lite", "")).status,
+            200
+        );
+        assert!(!c.data_dir.join("imported/my-lite").exists());
+        let r = answer(
+            &m,
+            &request("POST", "/tools/upscale_image", &up.to_string()),
+        );
+        assert_eq!(r.status, 400);
+        assert!(String::from_utf8_lossy(&r.body).contains("no imported model"));
     }
 
     #[test]
