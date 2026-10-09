@@ -1,0 +1,63 @@
+#!/bin/sh
+# commit-msg -- every commit explains itself.
+#
+# Installed by project:initialization into .githooks/ and wired with
+#   git config core.hooksPath .githooks
+# POSIX sh on purpose: Git for Windows runs hooks through its bundled shell, so this one
+# file covers Windows, Linux CI and any agent's sandbox.
+#
+# Rules (see the repo's CLAUDE.md, "Repository etiquette"):
+#   1. Subject is Conventional Commits:  type(scope)!: summary   -- 72 chars max
+#   2. A body is mandatory: at least one line of prose after the subject that is not an
+#      issue ref (Refs #12, Closes #12) or a known trailer (Co-Authored-By:, Signed-off-by:,
+#      ...). Only known trailer keys are stripped, so a body that opens with a label --
+#      "Note: ...", "Previously: ..." -- still counts as prose.
+#   3. No pasted `git status` / file lists -- the diff already carries that.
+# fixup!/squash!/amend! and merge/revert commits are exempt; autosquash them before a PR
+# is marked ready.
+#
+# Bypass for one commit: COMMIT_MSG_SKIP=1 git commit ...   (never use --no-verify:
+# it silently skips every other hook too)
+
+[ "${COMMIT_MSG_SKIP:-0}" = "1" ] && exit 0
+
+f="$1"
+# Drop comment lines and trailing whitespace; git strips comments after this hook runs.
+msg=$(sed -e '/^#/d' -e 's/[[:space:]]*$//' "$f")
+subject=$(printf '%s\n' "$msg" | sed -n '1p')
+
+case "$subject" in
+  fixup!*|squash!*|amend!*|"Merge "*|"Revert "*) exit 0 ;;
+esac
+
+fail() {
+  printf 'commit-msg: %s\n' "$1" >&2
+  printf '\n  subject: %s\n\n' "$subject" >&2
+  printf '  Expected:\n    feat(scope): short imperative summary\n\n    Why the change was made and what it does.\n\n    Refs #12\n' >&2
+  exit 1
+}
+
+types='feat|fix|docs|chore|refactor|test|ci|perf|build|style|revert'
+printf '%s\n' "$subject" | grep -Eq "^($types)(\([a-z0-9._/-]+\))?!?: [^ ].*" \
+  || fail "subject is not Conventional Commits ($types)"
+
+# Characters, not bytes: ${#subject} and wc -m both count bytes under dash or a C locale,
+# so an em-dash would cost three. Dropping UTF-8 continuation bytes leaves one per char.
+len=$(printf '%s' "$subject" | LC_ALL=C tr -d '\200-\277' | wc -c | tr -d ' ')
+[ "$len" -le 72 ] || fail "subject is $len chars; 72 max"
+
+# Body: lines after the subject that are neither blank, issue refs, nor known trailers.
+trailers='co-authored-by|signed-off-by|reviewed-by|acked-by|tested-by|reported-by|suggested-by|helped-by|cc|change-id|claude-session'
+body=$(printf '%s\n' "$msg" | sed '1d' \
+  | grep -Ev '^[[:space:]]*$' \
+  | grep -Eiv '^(refs|closes|fixes|resolves|part of) #[0-9]+' \
+  | grep -Eiv "^($trailers): ")
+[ -n "$body" ] || fail "no body -- say what changed and why, not just the subject"
+
+# Pasted status output or file lists.
+if printf '%s\n' "$msg" | sed '1d' | grep -Eq \
+   '^[[:space:]]*(modified|new file|deleted|renamed|typechange):[[:space:]]|^(On branch |Changes to be committed|Changes not staged|Untracked files)|^[ MADRCU?][MADRCU? ] [^ ]+$'; then
+  fail "body contains pasted git status / file-list output -- describe the change instead"
+fi
+
+exit 0

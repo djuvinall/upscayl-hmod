@@ -1,0 +1,22 @@
+#!/bin/sh
+# pre-commit -- no commits on the default branch.
+#
+# Installed by project:initialization into .githooks/. Catches the mistake before there is
+# a commit to move: work belongs on <type>/<issue>-<slug>. The first commit of a brand-new
+# repo is allowed, since there is no branch to branch from yet.
+#
+# Bypass once, deliberately:  ALLOW_COMMIT_DEFAULT=1 git commit ...
+
+[ "${ALLOW_COMMIT_DEFAULT:-0}" = "1" ] && exit 0
+git rev-parse --quiet --verify HEAD >/dev/null 2>&1 || exit 0
+
+branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null) || exit 0
+default=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||')
+[ -n "$default" ] || default=main
+
+if [ "$branch" = "$default" ]; then
+  printf 'pre-commit: you are on %s. Branch first:\n' "$default" >&2
+  printf '  git switch -c <type>/<issue>-<slug>\n' >&2
+  exit 1
+fi
+exit 0

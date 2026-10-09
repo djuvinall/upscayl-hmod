@@ -1,3 +1,9 @@
+> [!NOTE]
+> **This is upscayl-hmod**, a fork of [upscayl/upscayl](https://github.com/upscayl/upscayl) that adds a
+> HollowDeck module driving Upscayl's engine as orchestration tool nodes.
+> The module, its docs and its decisions live on this branch (`hmod/main`): start at [`CLAUDE.md`](CLAUDE.md) and [`ARCHITECTURE.md`](ARCHITECTURE.md).
+> `main` is an untouched mirror of upstream. Everything below this note is upstream's README.
+
 <div align="center">
 
   # v2.15 is out! 🥳 [Download Now ⬇️](https://github.com/upscayl/upscayl/releases/latest)

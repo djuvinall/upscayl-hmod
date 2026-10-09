@@ -1,0 +1,27 @@
+#!/bin/sh
+# pre-push -- nothing is pushed straight to the default branch.
+#
+# Installed by project:initialization into .githooks/. The default branch changes only by
+# merging a PR on GitHub, so a local push to it is always a mistake -- an agent that
+# committed on main, or a habit. GitHub Free does not enforce branch protection on private
+# repos, so this hook is the enforcement.
+#
+# Allowed: creating the default branch on an empty remote (first push of a new repo).
+# Refused: updating it, force-pushing it, or deleting it.
+# Bypass once, deliberately:  ALLOW_PUSH_DEFAULT=1 git push ...
+
+[ "${ALLOW_PUSH_DEFAULT:-0}" = "1" ] && exit 0
+
+remote="$1"
+default=$(git symbolic-ref --quiet --short "refs/remotes/$remote/HEAD" 2>/dev/null | sed "s|^$remote/||")
+[ -n "$default" ] || default=main
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$remote_ref" = "refs/heads/$default" ] || continue
+  # remote_sha all zeros = the branch does not exist there yet = first push. Allowed.
+  case "$remote_sha" in *[!0]*) ;; *) continue ;; esac
+  printf 'pre-push: refusing to push to %s on %s.\n' "$default" "$remote" >&2
+  printf '  Push a branch and open a PR:  git switch -c <type>/<issue>-<slug> && git push -u %s HEAD\n' "$remote" >&2
+  exit 1
+done
+exit 0
