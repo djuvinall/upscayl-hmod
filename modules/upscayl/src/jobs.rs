@@ -225,7 +225,11 @@ impl Jobs {
                 match result {
                     Ok(v) => {
                         r["state"] = json!(if cancelled { "cancelled" } else { "done" });
-                        r["progress"] = json!(100.0);
+                        // A cancelled batch still answers Ok, with what it did not do under
+                        // failed; it keeps the progress it reached.
+                        if !cancelled {
+                            r["progress"] = json!(100.0);
+                        }
                         r["result"] = v;
                     }
                     Err((_, m)) => {
@@ -632,6 +636,54 @@ mod tests {
             .map(|a| a.len())
             .unwrap_or(0);
         assert!(written < 12, "cancel came too late to test: {cancelled}");
+        assert_cancelled_honestly(&cancelled);
+    }
+
+    /// A cancelled job blames the cancel, never the budget, and keeps its progress.
+    fn assert_cancelled_honestly(rec: &Json) {
+        let failed = rec["failed"].as_array().cloned().unwrap_or_default();
+        assert!(!failed.is_empty(), "{rec}");
+        for f in &failed {
+            let f = f.as_str().unwrap_or("");
+            assert!(f.contains("cancel"), "{f}");
+            assert!(!f.contains("budget"), "{f}");
+        }
+        assert!(rec["progress"].as_f64().unwrap_or(100.0) < 100.0, "{rec}");
+    }
+
+    #[test]
+    fn a_cancelled_directory_run_says_cancelled_not_budget() {
+        let Some(c) = ctx() else { return };
+        let dir = fresh("cancel-dir");
+        let input = dir.join("in");
+        std::fs::create_dir_all(&input).unwrap();
+        for i in 0..24 {
+            std::fs::copy(sample(), input.join(format!("img{i:02}.jpeg"))).unwrap();
+        }
+        // One engine run over the folder (no double upscayl), slow enough to cancel.
+        let started = out(&start_job(
+            &post(
+                "start_job",
+                json!({"kind": "batch", "input_folder": input.display().to_string(), "model": "ultrasharp-4x", "tta": true}),
+            ),
+            &c,
+        ));
+        let id = started["job_id"].as_str().unwrap().to_string();
+        let t0 = Instant::now();
+        loop {
+            let st = out(&job_status(&post("job_status", json!({"job_id": id})), &c));
+            if st["state"] == "running" {
+                break;
+            }
+            assert!(
+                t0.elapsed() < Duration::from_secs(120),
+                "never started: {st}"
+            );
+            std::thread::sleep(Duration::from_millis(100));
+        }
+        let cancelled = out(&cancel_job(&post("cancel_job", json!({"job_id": id})), &c));
+        assert_eq!(cancelled["state"], "cancelled", "{cancelled}");
+        assert_cancelled_honestly(&cancelled);
     }
 
     #[test]

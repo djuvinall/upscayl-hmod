@@ -202,11 +202,16 @@ pub fn run(
             on_progress,
             should_stop,
         );
-        let (report, killed) = match result {
-            Ok(r) => (r, false),
-            Err((Failure::Budget(_) | Failure::Cancelled, r)) => (r, true),
+        // Why a file the engine never reached was not written, when the run was stopped.
+        let (report, stopped) = match result {
+            Ok(r) => (r, None),
+            Err((Failure::Cancelled, r)) => (r, Some("not processed, the job was cancelled")),
+            Err((Failure::Budget(_), r)) => (
+                r,
+                Some("not processed, the call's budget ran out; run this batch with start_job"),
+            ),
             Err((Failure::Spawn(e), _)) => return Err((500, e)),
-            Err((_, r)) => (r, false),
+            Err((_, r)) => (r, None),
         };
         for (f, (t, was)) in files.iter().zip(before) {
             let name = f
@@ -226,12 +231,9 @@ pub fn run(
                 .find(|e| e.contains(name.as_str()))
                 .cloned()
                 .unwrap_or_else(|| {
-                    if killed {
-                        "not processed, the call's budget ran out; run this batch with start_job"
-                            .into()
-                    } else {
-                        "the engine wrote no output for it".into()
-                    }
+                    stopped
+                        .unwrap_or("the engine wrote no output for it")
+                        .to_string()
                 });
             failed.push(format!("{name}: {reason}"));
         }
