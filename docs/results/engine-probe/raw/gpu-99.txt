@@ -1,0 +1,23 @@
+$ <repo>\resources\win\bin\upscayl-bin.exe -i <repo>\to_upscale.jpeg -o <work>\g99.png -m <repo>\resources\models -n upscayl-lite-4x -g 99 -f png
+# exit=4294967295 seconds=0.203
+## stdout
+
+## stderr
+[0 NVIDIA GeForce RTX 5070 Ti]  queueC=2[8]  queueG=0[16]  queueT=1[2]
+
+[0 NVIDIA GeForce RTX 5070 Ti]  bugsbn1=0  bugbilz=0  bugcopc=0  bugihfa=0
+
+[0 NVIDIA GeForce RTX 5070 Ti]  fp16-p/s/a=1/1/1  int8-p/s/a=1/1/1
+
+[0 NVIDIA GeForce RTX 5070 Ti]  subgroup=32  basic=1  vote=1  ballot=1  shuffle=1
+
+[1 AMD Radeon(TM) Graphics]  queueC=1[4]  queueG=0[8]  queueT=2[1]
+
+[1 AMD Radeon(TM) Graphics]  bugsbn1=0  bugbilz=0  bugcopc=0  bugihfa=0
+
+[1 AMD Radeon(TM) Graphics]  fp16-p/s/a=1/1/1  int8-p/s/a=1/1/1
+
+[1 AMD Radeon(TM) Graphics]  subgroup=64  basic=1  vote=1  ballot=1  shuffle=1
+
+🚨 Error: Invalid GPU Device
+

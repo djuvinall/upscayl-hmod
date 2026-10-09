@@ -16,7 +16,9 @@ Tools in `module.json` (node types `upscayl/<id>`). Ids and socket names are per
 | `list_models` | bundled + imported models with their licenses | `reads` |
 | `import_model` | copy a `.param`/`.bin` pair into the module's data dir and create its asset | `writes` |
 
-Inputs shared by the upscale tools (one socket per GUI setting and CLI flag): `input` (path), `output` (path, optional), `model` (`select` of the bundled models), `custom_model` (`str`, overrides `model` when non-empty: a `.param` path or a model token from an asset), `model_scale` (`-z`), `scale` (`-s`), `width` (`-w`), `resize` (`-r`), `format`, `compression`, `gpu_id`, `tile_size`, `threads` (`-j`), `tta`, `double_upscayl`, `copy_metadata`, `overwrite`.
+Inputs shared by the upscale tools (one socket per GUI setting and CLI flag): `input` (path), `output` (path, optional), `model` (`select` of the bundled models), `custom_model` (`str`, overrides `model` when non-empty: a `.param` path or a model token from an asset), `model_scale` (`-z`), `scale` (`-s`, 1–16), `width` (`-w`), `resize` (`-r`, `WxH`), `resize_filter`, `format`, `compression` (WebP only), `gpu_id`, `tile_size`, `threads` (`-j`), `tta`, `double_upscayl`, `copy_metadata`, `overwrite`.
+
+Argument rules, from `docs/results/engine-probe.md`: `-z` and `-s` are always sent; `width` and `resize` each replace `-s` and are mutually exclusive (a call setting both is refused); the output extension is derived from `format`; model files are checked before spawning; success is read from stderr, not the exit code.
 
 HTTP routes beyond the contract's: `api/assets` (the asset surface, see `model-assets.md`) and the panel's job API with a chunked progress stream.
 

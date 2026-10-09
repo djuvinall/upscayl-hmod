@@ -1,0 +1,7 @@
+$ <repo>\resources\win\bin\upscayl-bin.exe -i <repo>\to_upscale.jpeg -o <work>\custom.png -m <work>\custom -n upscayl-lite-4x -f png
+# exit=4294967295 seconds=0.014
+## stdout
+
+## stderr
+🚨 Error: Unknown model dir type. Make sure that the model directory is called 'models' with *.param and *.bin files inside it.
+
