@@ -1,8 +1,8 @@
-# upscayl-module (scaffolded; tools planned)
+# upscayl-module (built: tools #9–#13; panel in progress, #14)
 
 **Responsibility:** expose every engine capability to HollowDeck as tool nodes, supervise engine processes, and own the model assets. Rust, `kind: process`, id `upscayl`, at `modules/upscayl/`.
 
-Everything below is **intent**, decided 2026-10-08 (`decisions.md`). Replace each section with the real contract as it is built.
+Decided 2026-10-08 (`decisions.md`); each "Built (#n)" paragraph below is the shipped contract.
 
 ## Public interface
 
@@ -18,6 +18,8 @@ Tools in `module.json` (node types `upscayl/<id>`). Ids and socket names are per
 
 Inputs shared by the upscale tools (one socket per GUI setting and CLI flag): `input` (path), `output` (path, optional), `model` (`select` of the bundled models), `custom_model` (`str`, overrides `model` when non-empty: a `.param` path or a model token from an asset), `model_scale` (`-z`), `scale` (`-s`, 1–16), `width` (`-w`), `resize` (`-r`, `WxH`), `resize_filter`, `format`, `compression` (WebP only), `gpu_id`, `tile_size`, `threads` (`-j`), `tta`, `double_upscayl`, `copy_metadata`, `overwrite`.
 
+**Defaults (#30):** every tool fills an input the caller left out (absent, null or blank) from the default `module.json` declares for it (`Call::parse_for`). Graphs send every socket; a direct `/api/tools` call need not, and the manifest stays the only place a default is written. A test checks the manifest's defaults and the code's fallbacks produce the same settings.
+
 Argument rules, from `docs/results/engine-probe.md`: `-z` and `-s` are always sent; `width` and `resize` each replace `-s` and are mutually exclusive (a call setting both is refused); the output extension is derived from `format`; model files are checked before spawning; success is read from stderr, not the exit code.
 
 Built (#11): `POST tools/upscale_batch` with `input_folder`, `output_folder` and every `upscale_image` setting. Writes into `upscayl_<format>_<model>_<size>` inside the output folder (upstream's naming), files keeping their stems. Uses the engine's directory mode when it can (one model load, parallel files), per-file runs for double upscayl or when existing outputs must be skipped. Outputs `output_folder`, `outputs` (list), `failed` (list of "name: reason"), `complete`, `elapsed_ms`, `model`, `license`. Inputs that share a stem (`a.jpg`, `a.png`) are refused up front. A budget run-out lists the unprocessed files under `failed` rather than failing the node.
@@ -28,7 +30,7 @@ Built (#9): `POST tools/upscale_image`. Outputs `output`, `width`, `height`, `el
 
 Built (#5): `GET api/status` → `{version, platform, engine_staged, engine_path, licenses_present, data_dir}`, which the panel renders; `GET /module.json` read from the file; `--selfcheck` (the manifest's `verify`) checks `module.json`, `static/index.html` and `licenses/models.json` exist.
 
-Planned routes beyond the contract's: `api/assets` (the asset surface, see `model-assets.md`) and the panel's job API with a chunked progress stream.
+Built routes beyond the contract's: `GET/POST api/assets`, `GET/DELETE api/assets/{id}` (see `model-assets.md`) and `GET api/jobs` (see `jobs.md`).
 
 **SDK limit, handled:** `hollowdeck-module` routes match exact paths only, so `src/server.rs` runs this module's own accept loop for `GET/DELETE api/assets/{id}`: `http::read_request`, `Module::refuse` (the SDK's guard, unchanged), the prefix routes, then `Module::answer`. A streaming route added later goes through this loop too.
 

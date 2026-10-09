@@ -26,3 +26,9 @@ its reasoning gets overruled by the next plausible-sounding idea.
 **What happened:** the first branch-layout idea was a `hmod` branch with `hmod/feat/*` work branches.
 **Why:** git stores refs as paths; `refs/heads/hmod` (a file) and `refs/heads/hmod/feat` (a directory) cannot coexist.
 **Do instead:** the long-lived branch is `hmod/main`; work branches are `<type>/<issue>-<slug>`.
+
+## 2026-10-08 — `gh` in this checkout talks to upstream unless told otherwise
+
+**What happened:** `gh issue list` with no `-R` listed upscayl/upscayl's issues, not the fork's.
+**Why:** with an `upstream` remote and no default set, `gh` picks the parent repo of a fork. An `issue create` or `pr create` would have landed on upstream, in public.
+**Do instead:** `gh repo set-default djuvinall/upscayl-hmod` once per clone (now in CLAUDE.md's after-cloning step), and still pass `-R djuvinall/upscayl-hmod` in scripts.
