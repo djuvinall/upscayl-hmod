@@ -16,6 +16,7 @@ mod paths;
 mod resolve;
 mod server;
 mod upscale;
+mod views;
 
 fn main() -> Result<(), String> {
     let ctx = ModuleContext::from_env()?;
@@ -31,6 +32,7 @@ fn main() -> Result<(), String> {
     // Recover the job table now: a job the last process left running is marked
     // interrupted at start, not when someone next asks.
     jobs::Jobs::get(&ctx);
+    views::prune_inbox(&ctx);
     server::serve(build(ctx), routes())
 }
 
@@ -47,6 +49,10 @@ fn build(ctx: ModuleContext) -> Module {
         .tool("wait_job", jobs::wait_job)
         .tool("cancel_job", jobs::cancel_job)
         .get("/api/jobs", jobs::list)
+        .get("/api/image", views::image)
+        .post("/api/upload", views::upload)
+        .get("/api/select", views::get_selection)
+        .post("/api/select", views::post_selection)
         // A running or queued job keeps the module alive while nobody is watching.
         .hold_while(|_| jobs::busy_now())
         .get("/api/assets", assets::list)
