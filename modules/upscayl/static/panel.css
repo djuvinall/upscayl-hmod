@@ -1,11 +1,228 @@
-/* The Upscayl panel -- only what is this module's own. Everything generic (.btn,
- * .diag, .mono, k-panel, k-rows) comes from the vendored kit in static/vendor/.
- * No literal colours: every colour is a var(--darkglass-*) token. */
+/* The Upscayl panel -- only what is this module's own. Everything generic comes from
+ * the vendored kit in static/vendor/. No literal colours: every colour is a
+ * var(--darkglass-*) token. Sizes in rem or tokens, never px (borders aside). */
 
 .upscayl-page {
   padding: var(--darkglass-dimension-space-5);
   display: flex;
   flex-direction: column;
-  gap: var(--darkglass-dimension-space-5);
+  gap: var(--darkglass-dimension-space-4);
   min-height: 100%;
+}
+
+/* Two panes side by side when there is room, stacked when there is not. */
+.upscayl-panes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  gap: var(--darkglass-dimension-space-4);
+  align-items: start;
+}
+
+.upscayl-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--darkglass-dimension-space-4);
+}
+
+.upscayl-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--darkglass-dimension-space-2);
+  padding-top: var(--darkglass-dimension-space-3);
+}
+
+.upscayl-license {
+  margin: var(--darkglass-dimension-space-2) 0;
+  color: var(--darkglass-text-secondary);
+  font-size: var(--darkglass-typography-size-caption);
+}
+
+.upscayl-license[data-commercial="forbidden"] {
+  color: var(--darkglass-text-warning);
+}
+
+.upscayl-jobs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--darkglass-dimension-space-3);
+}
+
+.upscayl-job {
+  display: flex;
+  flex-direction: column;
+  gap: var(--darkglass-dimension-space-1);
+}
+
+.upscayl-job__head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--darkglass-dimension-space-2);
+  align-items: baseline;
+}
+
+.upscayl-job__detail {
+  color: var(--darkglass-text-secondary);
+  font-size: var(--darkglass-typography-size-caption);
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------- run view: drop */
+
+/* Covers the view while files are dragged over it; pointer-events off so the drop
+ * lands on the document beneath. */
+.upscayl-drop {
+  position: fixed;
+  inset: var(--darkglass-dimension-space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.125rem dashed var(--darkglass-border-focus);
+  border-radius: var(--darkglass-dimension-radius-lg);
+  background: var(--darkglass-surface-elevated);
+  color: var(--darkglass-text-primary);
+  font-size: var(--darkglass-typography-size-title);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.upscayl-drop[hidden] {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- preview view */
+
+.upscayl-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--darkglass-dimension-space-3);
+}
+
+.upscayl-toolbar > hd-enum {
+  min-width: 14rem;
+}
+
+/* The preview fills its area: the toolbar, then the stage, then the caption. */
+.upscayl-page--preview {
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.upscayl-stage {
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--darkglass-dimension-space-2);
+}
+
+.upscayl-stage[hidden] {
+  display: none;
+}
+
+/* Fit: the pair is as large as the frame allows at the result's aspect ratio (--ar,
+ * set from the after image), and the before is stretched over the after, so both read
+ * at one scale. 100%: the after image at its own pixels, scrolled. */
+.upscayl-frame {
+  flex: 1;
+  min-height: 0;
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+
+.upscayl-stage[data-zoom="actual"] .upscayl-frame {
+  container-type: normal;
+  display: block;
+  overflow: auto;
+}
+
+.upscayl-compare {
+  --split: 50%;
+  --ar: 1;
+  position: relative;
+  user-select: none;
+  touch-action: none;
+  cursor: ew-resize;
+  background: var(--darkglass-surface-sunken);
+  line-height: 0;
+}
+
+.upscayl-stage[data-zoom="fit"] .upscayl-compare {
+  width: min(100cqw, calc(100cqh * var(--ar)));
+  aspect-ratio: var(--ar);
+}
+
+.upscayl-stage[data-zoom="actual"] .upscayl-compare {
+  display: inline-block;
+}
+
+.upscayl-compare__after {
+  display: block;
+}
+
+.upscayl-stage[data-zoom="fit"] .upscayl-compare__after {
+  width: 100%;
+  height: 100%;
+}
+
+.upscayl-compare__before {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 calc(100% - var(--split)) 0 0);
+}
+
+.upscayl-compare__before-img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+.upscayl-compare.is-pixelated .upscayl-compare__before-img {
+  image-rendering: pixelated;
+}
+
+.upscayl-compare__handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--split);
+  width: 0.125rem;
+  margin-left: -0.0625rem;
+  background: var(--darkglass-text-primary);
+  outline-offset: 0.125rem;
+}
+
+.upscayl-compare__handle:focus-visible {
+  outline: 0.125rem solid var(--darkglass-border-focus);
+}
+
+.upscayl-compare__tag {
+  position: absolute;
+  top: var(--darkglass-dimension-space-2);
+  padding: var(--darkglass-dimension-space-1) var(--darkglass-dimension-space-2);
+  border-radius: var(--darkglass-dimension-radius-sm);
+  background: var(--darkglass-surface-elevated);
+  color: var(--darkglass-text-secondary);
+  font-size: var(--darkglass-typography-size-caption);
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.upscayl-compare__tag--before {
+  left: var(--darkglass-dimension-space-2);
+}
+
+.upscayl-compare__tag--after {
+  right: var(--darkglass-dimension-space-2);
+}
+
+.upscayl-caption {
+  color: var(--darkglass-text-secondary);
+  font-size: var(--darkglass-typography-size-caption);
+  overflow-wrap: anywhere;
 }

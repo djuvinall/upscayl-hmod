@@ -1,4 +1,4 @@
-# upscayl-module (built: tools #9–#13; panel in progress, #14)
+# upscayl-module (built: tools #9–#13, panel #14)
 
 **Responsibility:** expose every engine capability to HollowDeck as tool nodes, supervise engine processes, and own the model assets. Rust, `kind: process`, id `upscayl`, at `modules/upscayl/`.
 
@@ -31,6 +31,10 @@ Built (#9): `POST tools/upscale_image`. Outputs `output`, `width`, `height`, `el
 Built (#5): `GET api/status` → `{version, platform, engine_staged, engine_path, licenses_present, data_dir}`, which the panel renders; `GET /module.json` read from the file; `--selfcheck` (the manifest's `verify`) checks `module.json`, `static/index.html` and `licenses/models.json` exist.
 
 Built routes beyond the contract's: `GET/POST api/assets`, `GET/DELETE api/assets/{id}` (see `model-assets.md`) and `GET api/jobs` (see `jobs.md`).
+
+Built (#14): three views, one per interface, so people compose their own workspaces (Devon, 2026-10-09). `upscayl:main` (*Upscayl*, `static/index.html`): every tool setting, a drop target, and the results with progress, cancel and *Preview*. `upscayl:preview` (*Upscayl Preview*, `preview.html`): the selected result with a before/after slider (pointer drag and arrow/Page/Home/End keys), Fit or 100% zoom, the original as pixels, and a file picker with `[`/`]` for a batch. `upscayl:models` (*Upscayl Models*, `models.html`): models with license, commercial use and staged state, and the import form. The extra pages are served at the module root so their relative URLs resolve like the main view's. All work goes through `start_job`; job rows update in place; a poll error clears on the next good poll.
+
+View routes (`src/views.rs`): `GET api/image?job&n&side=before|after` serves only paths a finished job recorded (a batch's input found by stem); `POST api/upload?drop&name&offset` takes a dropped file in slices of at most 16 MB (the SDK's body limit) into `<data>/inbox/<drop>/`, pruned after 7 days at start; `GET/POST api/select` holds the shown result, and `GET api/live` is a chunked `text/event-stream` announcing each change, answered by the accept loop after the guard. A drop in a HollowDeck view is a browser `File`, never a path (the shell turns Tauri's drop handler off), hence the upload; results of dropped files go to `<data>/outputs/` unless *Save to* names a folder. An open Preview holds `api/live`, which keeps the module from being idle-stopped while someone is looking.
 
 **SDK limit, handled:** `hollowdeck-module` routes match exact paths only, so `src/server.rs` runs this module's own accept loop for `GET/DELETE api/assets/{id}`: `http::read_request`, `Module::refuse` (the SDK's guard, unchanged), the prefix routes, then `Module::answer`. A streaming route added later goes through this loop too.
 

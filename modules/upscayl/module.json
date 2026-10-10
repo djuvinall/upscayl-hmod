@@ -12,11 +12,9 @@
     "--selfcheck"
   ],
   "panels": [
-    {
-      "id": "main",
-      "title": "Upscayl",
-      "path": ""
-    }
+    { "id": "main", "title": "Upscayl", "path": "" },
+    { "id": "preview", "title": "Upscayl Preview", "path": "preview.html" },
+    { "id": "models", "title": "Upscayl Models", "path": "models.html" }
   ],
   "requires": [],
   "depends": {},

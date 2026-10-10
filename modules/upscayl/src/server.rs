@@ -57,6 +57,12 @@ pub fn answer(module: &Module, routes: &[PrefixRoute], request: &Request, port: 
     module.answer(request, port)
 }
 
+/// Whether this is `GET api/live`, the one route that keeps its connection.
+fn is_live(module: &Module, request: &Request) -> bool {
+    request.method.eq_ignore_ascii_case("GET")
+        && strip_mount(&request.path, &module.context().mount_path) == "/api/live"
+}
+
 /// Bind the port the host gave, on loopback, and answer until killed. `127.0.0.1` is
 /// written out, as the SDK does: nothing here may listen on a network.
 pub fn serve(module: Module, routes: Vec<PrefixRoute>) -> Result<(), String> {
@@ -76,6 +82,18 @@ pub fn serve(module: Module, routes: Vec<PrefixRoute>) -> Result<(), String> {
         let routes = Arc::clone(&routes);
         std::thread::spawn(move || {
             let response = match http::read_request(&stream) {
+                // The live stream keeps its connection, so it is answered here, after
+                // the same guard every other route passes (the SDK's own loop does
+                // the same for `Module::stream` routes).
+                Ok(Some(request)) if is_live(&module, &request) => {
+                    match module.refuse(&request, port) {
+                        Some(refusal) => refusal,
+                        None => {
+                            crate::views::live(&mut stream);
+                            return;
+                        }
+                    }
+                }
                 Ok(Some(request)) => answer(&module, &routes, &request, port),
                 Ok(None) => return,
                 Err(refusal) => refusal,
