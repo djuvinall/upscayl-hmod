@@ -63,7 +63,19 @@ fn build(ctx: ModuleContext) -> Module {
                 Err(e) => Response::error(500, &format!("cannot read module.json: {e}")),
             }
         })
+        // The other views sit beside index.html, at the module root, so their relative
+        // URLs (api/..., static/...) resolve exactly as the main view's do.
+        .get("/preview.html", |_req, ctx| page(ctx, "preview.html"))
+        .get("/models.html", |_req, ctx| page(ctx, "models.html"))
         .statics("static")
+}
+
+/// One of the views' pages, from `static/`.
+fn page(ctx: &ModuleContext, name: &str) -> Response {
+    match std::fs::read(ctx.module_path(&format!("static/{name}"))) {
+        Ok(bytes) => Response::new(200, "text/html; charset=utf-8", bytes),
+        Err(e) => Response::error(500, &format!("cannot read static/{name}: {e}")),
+    }
 }
 
 /// The routes with an id in the path, which the SDK cannot match (see `server.rs`).
@@ -104,7 +116,13 @@ fn status(_req: &Request, ctx: &ModuleContext) -> Response {
 /// A missing engine is not a failure here -- it is staged by the sync script, and the
 /// panel says so -- but a missing manifest, panel or license record is.
 fn selfcheck(ctx: &ModuleContext) -> Result<(), String> {
-    for rel in ["module.json", "static/index.html", paths::LICENSES_FILE] {
+    for rel in [
+        "module.json",
+        "static/index.html",
+        "static/preview.html",
+        "static/models.html",
+        paths::LICENSES_FILE,
+    ] {
         let p = ctx.module_path(rel);
         if !p.is_file() {
             return Err(format!("missing {}", p.display()));
@@ -207,6 +225,17 @@ mod tests {
         assert!(String::from_utf8_lossy(&manifest.body).contains("\"id\": \"upscayl\""));
         let panel = m.answer(&get("/", &host), PORT);
         assert_eq!(panel.status, 200);
+        // Every view the manifest declares is served at its path, under the mount too.
+        let manifest: serde_json::Value = serde_json::from_slice(&manifest.body).unwrap();
+        for p in manifest["panels"].as_array().unwrap() {
+            let path = format!("/m/upscayl/{}", p["path"].as_str().unwrap());
+            let page = m.answer(&get(&path, &host), PORT);
+            assert_eq!(page.status, 200, "{path}");
+            assert!(
+                String::from_utf8_lossy(&page.body).contains("<title>Upscayl"),
+                "{path}"
+            );
+        }
     }
 
     /// `resolve.rs` is HollowDeck's reference path resolver carried verbatim

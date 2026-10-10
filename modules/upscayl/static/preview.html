@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upscayl Preview</title>
+  <!-- Relative URLs only: served at /m/upscayl/preview.html hosted, /preview.html standalone. -->
+  <link rel="stylesheet" href="static/vendor/darkglass.css">
+  <link rel="stylesheet" href="static/vendor/panel.css">
+  <link rel="stylesheet" href="static/vendor/module.css">
+  <link rel="stylesheet" href="static/panel.css">
+</head>
+<body>
+  <main class="upscayl-page upscayl-page--preview" id="page" data-status="loading">
+    <hd-report id="error" severity="error" hidden data-testid="error"></hd-report>
+
+    <div class="upscayl-toolbar" data-hd-region="toolbar">
+      <hd-enum id="job" label="Result" loading data-testid="job"></hd-enum>
+      <hd-enum id="file" label="File" hidden data-testid="file"></hd-enum>
+      <hd-button id="prev" variant="ghost" tooltip="Previous file" shortcut="[" hidden>Previous</hd-button>
+      <hd-button id="next" variant="ghost" tooltip="Next file" shortcut="]" hidden>Next</hd-button>
+      <hd-radio-row id="zoom" label="Zoom" value="fit">
+        <option value="fit">Fit</option>
+        <option value="actual">100%</option>
+      </hd-radio-row>
+      <hd-checkbox id="pixelated" label="Original as pixels"
+                   tooltip="Show the original's pixels unsmoothed, as the engine saw them"></hd-checkbox>
+    </div>
+
+    <p class="pane-hint" id="empty" data-testid="empty">
+      No result to show yet. Upscale something in the Upscayl view, then press Preview on a result.
+    </p>
+
+    <figure class="upscayl-stage" id="stage" hidden data-zoom="fit" data-testid="stage">
+      <div class="upscayl-frame" id="frame">
+      <div class="upscayl-compare" id="compare">
+        <img class="upscayl-compare__after" id="after" alt="After: the upscaled image">
+        <div class="upscayl-compare__before" id="before-clip">
+          <img class="upscayl-compare__before-img" id="before" alt="Before: the original image">
+        </div>
+        <div class="upscayl-compare__handle" id="handle" role="slider" tabindex="0"
+             aria-label="Before and after split" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
+             aria-valuetext="50% before"></div>
+        <span class="upscayl-compare__tag upscayl-compare__tag--before">Before</span>
+        <span class="upscayl-compare__tag upscayl-compare__tag--after">After</span>
+      </div>
+      </div>
+      <figcaption class="upscayl-caption" id="caption" data-testid="caption"></figcaption>
+    </figure>
+  </main>
+  <script src="static/vendor/module.js"></script>
+  <script src="static/vendor/kit.js"></script>
+  <script src="static/common.js"></script>
+  <script src="static/preview.js"></script>
+</body>
+</html>

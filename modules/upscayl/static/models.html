@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upscayl Models</title>
+  <!-- Relative URLs only: served at /m/upscayl/models.html hosted, /models.html standalone. -->
+  <link rel="stylesheet" href="static/vendor/darkglass.css">
+  <link rel="stylesheet" href="static/vendor/panel.css">
+  <link rel="stylesheet" href="static/vendor/module.css">
+  <link rel="stylesheet" href="static/panel.css">
+</head>
+<body>
+  <main class="upscayl-page" id="page" data-status="loading">
+    <hd-report id="error" severity="error" hidden data-testid="error"></hd-report>
+
+    <!-- Every model the module can run, with the license it carries. -->
+    <hd-panel heading="Models" id="models-panel" data-testid="models">
+      <div class="k-skeleton" id="models-skeleton"></div>
+      <div class="k-rows" data-density="dense" id="models"></div>
+    </hd-panel>
+
+    <hd-panel heading="Import a model" id="import" collapsed data-testid="import-panel">
+      <hd-props>
+        <hd-path id="imp_param" label=".param file" kind="file"></hd-path>
+        <hd-text id="imp_name" label="Name" value="" placeholder="Empty: the file name"></hd-text>
+        <hd-text id="imp_license" label="License" value="" placeholder="SPDX id, e.g. CC-BY-4.0" mono></hd-text>
+        <hd-enum id="imp_commercial" label="Commercial use" value="unknown">
+          <option value="unknown">Unknown</option>
+          <option value="allowed">Allowed</option>
+          <option value="forbidden">Forbidden</option>
+        </hd-enum>
+        <hd-text id="imp_source" label="Source URL" value=""></hd-text>
+        <hd-text id="imp_attribution" label="Attribution" value=""></hd-text>
+      </hd-props>
+      <div class="upscayl-actions">
+        <hd-button id="imp_go" data-testid="import">Import</hd-button>
+      </div>
+    </hd-panel>
+  </main>
+  <script src="static/vendor/module.js"></script>
+  <script src="static/vendor/kit.js"></script>
+  <script src="static/common.js"></script>
+  <script src="static/models.js"></script>
+</body>
+</html>

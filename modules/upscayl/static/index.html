@@ -14,9 +14,9 @@
   <main class="upscayl-page" id="page" data-status="loading">
     <hd-report id="setup" severity="warning" hidden data-testid="setup"></hd-report>
     <hd-report id="error" severity="error" hidden data-testid="error"></hd-report>
+    <hd-report id="dropped" severity="info" hidden data-testid="dropped"></hd-report>
 
     <div class="upscayl-panes">
-      <!-- Left: what to upscale and how. -->
       <hd-panel heading="Upscale" id="form" data-testid="form">
         <hd-props>
           <hd-radio-row id="mode" label="Mode" value="image">
@@ -24,10 +24,11 @@
             <option value="batch">Folder</option>
           </hd-radio-row>
           <hd-path id="input" label="Image" kind="file" data-mode="image"
-                   placeholder="Paste a full path (Copy as path works)"></hd-path>
+                   placeholder="Drop an image here, or paste its path"></hd-path>
           <hd-path id="output" label="Save to" kind="dir" data-mode="image"
                    placeholder="Empty: beside the image"></hd-path>
-          <hd-path id="input_folder" label="Folder" kind="dir" data-mode="batch" hidden></hd-path>
+          <hd-path id="input_folder" label="Folder" kind="dir" data-mode="batch" hidden
+                   placeholder="Drop images or a folder here, or paste its path"></hd-path>
           <hd-path id="output_folder" label="Save to" kind="dir" data-mode="batch" hidden
                    placeholder="Empty: inside the folder"></hd-path>
           <hd-enum id="model" label="Model" loading></hd-enum>
@@ -79,41 +80,22 @@
         </div>
       </hd-panel>
 
-      <div class="upscayl-side">
-        <!-- Right, top: what is running and what finished. -->
-        <hd-panel heading="Jobs" id="jobs-panel" data-testid="jobs">
-          <div class="k-skeleton" id="jobs-skeleton"></div>
-          <p class="pane-hint" id="jobs-empty" hidden>No jobs yet. Started jobs, and their outputs, appear here.</p>
-          <ul class="upscayl-jobs" id="jobs"></ul>
-        </hd-panel>
+      <!-- What is running and what finished. A finished result opens in the Preview view. -->
+      <hd-panel heading="Results" id="jobs-panel" data-testid="jobs">
+        <div class="k-skeleton" id="jobs-skeleton"></div>
+        <p class="pane-hint" id="jobs-empty" hidden>No results yet. Started jobs, and their outputs, appear here.</p>
+        <ul class="upscayl-jobs" id="jobs"></ul>
+      </hd-panel>
+    </div>
 
-        <!-- Right, bottom: the models and their licenses. -->
-        <hd-panel heading="Models" id="models-panel" data-testid="models">
-          <div class="k-skeleton" id="models-skeleton"></div>
-          <div class="k-rows" data-density="dense" id="models"></div>
-          <hd-panel heading="Import a model" id="import" collapsed>
-            <hd-props>
-              <hd-path id="imp_param" label=".param file" kind="file"></hd-path>
-              <hd-text id="imp_name" label="Name" value="" placeholder="Empty: the file name"></hd-text>
-              <hd-text id="imp_license" label="License" value="" placeholder="SPDX id, e.g. CC-BY-4.0" mono></hd-text>
-              <hd-enum id="imp_commercial" label="Commercial use" value="unknown">
-                <option value="unknown">Unknown</option>
-                <option value="allowed">Allowed</option>
-                <option value="forbidden">Forbidden</option>
-              </hd-enum>
-              <hd-text id="imp_source" label="Source URL" value=""></hd-text>
-              <hd-text id="imp_attribution" label="Attribution" value=""></hd-text>
-            </hd-props>
-            <div class="upscayl-actions">
-              <hd-button id="imp_go" data-testid="import">Import</hd-button>
-            </div>
-          </hd-panel>
-        </hd-panel>
-      </div>
+    <!-- Shown while files are dragged over the view. -->
+    <div class="upscayl-drop" id="drop" hidden aria-hidden="true">
+      <p>Drop images or a folder to upscale</p>
     </div>
   </main>
   <script src="static/vendor/module.js"></script>
   <script src="static/vendor/kit.js"></script>
-  <script src="static/panel.js"></script>
+  <script src="static/common.js"></script>
+  <script src="static/run.js"></script>
 </body>
 </html>

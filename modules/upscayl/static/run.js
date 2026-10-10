@@ -1,35 +1,12 @@
-// The Upscayl panel. Plain JS, no build step. Every URL is relative ("api/jobs",
-// "tools/start_job"), so the page works at /m/upscayl/ hosted and at / standalone.
-// Work is submitted as jobs, so a long upscale never holds this page's request open.
+// The Upscayl run view: every setting, a drop target, and the results. Work is
+// submitted as jobs, so a long upscale never holds this page's request open. A finished
+// result opens in the Preview view through the module's server (api/select).
 (function () {
   "use strict";
 
-  const $ = (id) => document.getElementById(id);
-  let models = []; // asset records: {id, name, properties, token}
-
-  function report(id, text) {
-    const el = $(id);
-    el.textContent = text || "";
-    el.hidden = !text;
-  }
-
-  async function getJson(url) {
-    const res = await fetch(url, { headers: { accept: "application/json" } });
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(body.detail || `${url} returned ${res.status}`);
-    return body;
-  }
-
-  async function callTool(tool, inputs) {
-    const res = await fetch(`tools/${tool}`, {
-      method: "POST",
-      headers: { "content-type": "application/json", accept: "application/json" },
-      body: JSON.stringify({ inputs }),
-    });
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(body.detail || `${tool} returned ${res.status}`);
-    return body.outputs;
-  }
+  const { $, report, getJson, callTool, loadModels, licenseLine, select } = window.upscayl;
+  let models = [];
+  let dataDir = "";
 
   const val = (id) => {
     const el = $(id);
@@ -39,6 +16,12 @@
   const checked = (id) => {
     const el = $(id);
     return Boolean(el.checked ?? el.hasAttribute("checked"));
+  };
+  const setVal = (id, value) => {
+    const el = $(id);
+    el.value = value;
+    el.setAttribute("value", value);
+    el.dispatchEvent(new Event("change", { bubbles: true }));
   };
 
   // ---------------------------------------------------------------- the form
@@ -59,15 +42,8 @@
   function showLicense() {
     const m = models.find((x) => x.token === val("model"));
     const el = $("license");
-    if (!m) {
-      el.textContent = "";
-      return;
-    }
-    const p = m.properties || {};
-    const use = p.commercial_use === "forbidden" ? "non-commercial use only"
-      : p.commercial_use === "allowed" ? "commercial use allowed" : "commercial use unknown";
-    el.textContent = `${p.license || "unknown license"} · ${use}${p.attribution ? " · " + p.attribution : ""}`;
-    el.dataset.commercial = p.commercial_use || "unknown";
+    el.textContent = m ? licenseLine(m.properties) : "";
+    el.dataset.commercial = m ? m.properties.commercial_use || "unknown" : "unknown";
   }
 
   function fillModels() {
@@ -79,52 +55,17 @@
     for (const m of models) {
       const o = document.createElement("option");
       o.value = m.token;
-      const p = m.properties || {};
+      const p = m.properties;
       o.textContent = `${m.name} (${p.license || "unknown"})${p.staged === false ? " - not staged" : ""}`;
       fresh.appendChild(o);
     }
-    // Keep the current pick across a refresh (an import refreshes the list).
+    // Keep the current pick across a refresh.
     const kept = models.find((m) => m.token === val("model"));
     const first = kept || models.find((m) => m.name === "upscayl-standard-4x") || models[0];
     if (first) fresh.setAttribute("value", first.token);
     old.replaceWith(fresh);
     fresh.addEventListener("change", showLicense);
     showLicense();
-
-    const rows = $("models");
-    rows.replaceChildren();
-    for (const m of models) {
-      const p = m.properties || {};
-      const row = document.createElement("div");
-      row.className = "k-row";
-      const label = document.createElement("span");
-      label.className = "k-row__label";
-      label.textContent = m.name;
-      const value = document.createElement("span");
-      value.className = "k-row__value";
-      value.textContent = [
-        p.license || "unknown",
-        p.commercial_use === "forbidden" ? "non-commercial" : p.commercial_use || "unknown",
-        p.staged === false ? "not staged" : null,
-      ].filter(Boolean).join(" · ");
-      if (p.attribution) value.setAttribute("tooltip", p.attribution);
-      row.append(label, value);
-      rows.appendChild(row);
-    }
-    $("models-skeleton").hidden = true;
-  }
-
-  async function loadModels() {
-    const list = await getJson("api/assets");
-    models = (list.assets || [])
-      .filter((a) => a.kind === "ncnn_model")
-      .map((a) => ({
-        id: a.id,
-        name: a.name,
-        properties: a.properties || {},
-        token: a.id.startsWith("bundled-") ? `upscayl:bundled/${a.properties.model_name}` : `upscayl:imported/${a.id}`,
-      }));
-    fillModels();
   }
 
   function inputs() {
@@ -173,11 +114,134 @@
     }
   }
 
-  // ---------------------------------------------------------------- jobs
+  // ---------------------------------------------------------------- drop
 
-  // Each job's row is built once and updated in place on every poll. Rebuilding the list
-  // each second would replace the cancel button under the pointer between mousedown and
-  // mouseup, and the click would never land.
+  // A drop in a HollowDeck view is a browser File, never a path (the shell turns
+  // Tauri's drop handler off), so files are uploaded to the module's inbox in slices
+  // the module's 16 MB body limit allows, and the form is pointed at the copies.
+  const SLICE = 8 * 1024 * 1024;
+  const IMAGE = /\.(png|jpe?g|webp)$/i;
+
+  // Every image under the dropped items, folders walked one level deep and more.
+  async function droppedFiles(dataTransfer) {
+    const entries = [...dataTransfer.items]
+      .map((item) => (item.webkitGetAsEntry ? item.webkitGetAsEntry() : null))
+      .filter(Boolean);
+    if (!entries.length) return [...dataTransfer.files];
+    const files = [];
+    const walk = async (entry) => {
+      if (entry.isFile) {
+        files.push(await new Promise((ok, fail) => entry.file(ok, fail)));
+      } else if (entry.isDirectory) {
+        const reader = entry.createReader();
+        for (;;) {
+          const batch = await new Promise((ok, fail) => reader.readEntries(ok, fail));
+          if (!batch.length) break;
+          for (const e of batch) await walk(e);
+        }
+      }
+    };
+    for (const e of entries) await walk(e);
+    return files;
+  }
+
+  async function upload(drop, file, onBytes) {
+    let last = null;
+    for (let offset = 0; offset === 0 || offset < file.size; offset += SLICE) {
+      const q = `drop=${encodeURIComponent(drop)}&name=${encodeURIComponent(file.name)}&offset=${offset}`;
+      const res = await fetch(`api/upload?${q}`, {
+        method: "POST",
+        headers: { "content-type": "application/octet-stream", accept: "application/json" },
+        body: file.slice(offset, offset + SLICE),
+      });
+      last = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(last.detail || `uploading ${file.name} returned ${res.status}`);
+      onBytes(Math.min(offset + SLICE, file.size));
+      if (file.size === 0) break;
+    }
+    return last;
+  }
+
+  async function takeDrop(dataTransfer) {
+    report("error", "");
+    const all = await droppedFiles(dataTransfer);
+    const files = all.filter((f) => IMAGE.test(f.name));
+    const skipped = all.length - files.length;
+    if (!files.length) {
+      report("error", "Nothing to upscale in that drop: only PNG, JPEG and WebP images are taken.");
+      return;
+    }
+    const names = new Set();
+    const clash = files.find((f) => (names.has(f.name) ? true : (names.add(f.name), false)));
+    if (clash) {
+      report("error", `Two dropped files are both named ${clash.name}; drop them separately.`);
+      return;
+    }
+    const drop = `d${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    const total = files.reduce((n, f) => n + f.size, 0);
+    let done = 0;
+    let last = null;
+    for (const f of files) {
+      const before = done;
+      last = await upload(drop, f, (bytes) => {
+        done = before + bytes;
+        report("dropped", `Copying ${files.length} file(s) into the module… ${Math.round((100 * done) / Math.max(total, 1))}%`);
+      });
+    }
+    // Dropped files have no folder of their own, so results go to the module's outputs
+    // folder unless "Save to" already names one.
+    const sep = dataDir.includes("\\") ? "\\" : "/";
+    const outputs = dataDir ? `${dataDir}${sep}outputs` : "";
+    if (files.length === 1) {
+      setVal("mode", "image");
+      setVal("input", last.path);
+      if (!val("output") && outputs) setVal("output", outputs);
+    } else {
+      setVal("mode", "batch");
+      setVal("input_folder", last.folder);
+      if (!val("output_folder") && outputs) setVal("output_folder", outputs);
+    }
+    syncVisibility();
+    report("dropped", `${files.length === 1 ? files[0].name : files.length + " images"} ready${skipped ? ` (${skipped} non-image file(s) skipped)` : ""}. Press Upscale.`);
+    $("start").focus?.();
+  }
+
+  function wireDrop() {
+    const overlay = $("drop");
+    let depth = 0;
+    const hasFiles = (ev) => [...(ev.dataTransfer?.types || [])].includes("Files");
+    document.addEventListener("dragenter", (ev) => {
+      if (!hasFiles(ev)) return;
+      ev.preventDefault();
+      depth += 1;
+      overlay.hidden = false;
+    });
+    document.addEventListener("dragover", (ev) => {
+      if (!hasFiles(ev)) return;
+      ev.preventDefault();
+      ev.dataTransfer.dropEffect = "copy";
+    });
+    document.addEventListener("dragleave", (ev) => {
+      if (!hasFiles(ev)) return;
+      depth = Math.max(0, depth - 1);
+      if (!depth) overlay.hidden = true;
+    });
+    document.addEventListener("drop", (ev) => {
+      if (!hasFiles(ev)) return;
+      ev.preventDefault();
+      depth = 0;
+      overlay.hidden = true;
+      takeDrop(ev.dataTransfer).catch((err) => {
+        report("dropped", "");
+        report("error", err.message || String(err));
+      });
+    });
+  }
+
+  // ---------------------------------------------------------------- results
+
+  // Each row is built once and updated in place on every poll; rebuilding would replace
+  // the cancel button under the pointer and the click would never land.
   function renderJob(li, j) {
     if (!li) {
       li = document.createElement("li");
@@ -215,6 +279,19 @@
       set("label", j.state === "running" ? `${pct}%` : "queued");
     } else if (bar) {
       bar.remove();
+    }
+    // A finished result with a file opens in Preview.
+    let open = li.querySelector(".upscayl-job__open");
+    if (j.outputs && j.outputs.length && !open) {
+      open = document.createElement("hd-button");
+      open.className = "upscayl-job__open";
+      open.setAttribute("variant", "ghost");
+      open.setAttribute("tooltip", "Show before and after in the Upscayl Preview view");
+      open.textContent = "Preview";
+      open.addEventListener("click", () => {
+        select(j.job_id, 0).catch((err) => report("error", err.message || String(err)));
+      });
+      li.querySelector(".upscayl-job__head").appendChild(open);
     }
     const parts = [];
     if (j.output) parts.push(j.output);
@@ -271,30 +348,6 @@
     loadJobs();
   }
 
-  // ---------------------------------------------------------------- import
-
-  async function importModel() {
-    report("error", "");
-    const button = $("imp_go");
-    button.setAttribute("loading", "");
-    try {
-      const out = await callTool("import_model", {
-        param: val("imp_param"),
-        name: val("imp_name"),
-        license: val("imp_license"),
-        commercial_use: val("imp_commercial") || "unknown",
-        source_url: val("imp_source"),
-        attribution: val("imp_attribution"),
-      });
-      window.hdeck?.post?.("hdeck:report", { severity: "success", message: `Imported ${out.name} as ${out.model}` });
-      await loadModels();
-    } catch (err) {
-      report("error", err.message || String(err));
-    } finally {
-      button.removeAttribute("loading");
-    }
-  }
-
   // ---------------------------------------------------------------- start up
 
   async function boot() {
@@ -303,14 +356,20 @@
       $(id).addEventListener("input", syncVisibility);
     }
     $("start").addEventListener("click", start);
-    $("imp_go").addEventListener("click", importModel);
+    wireDrop();
     syncVisibility();
+    // A model imported in the Models view appears here the next time this view is used.
+    window.addEventListener("focus", () => {
+      loadModels().then((m) => { models = m; fillModels(); }).catch(() => {});
+    });
     try {
       const status = await getJson("api/status");
+      dataDir = status.data_dir || "";
       if (!status.engine_staged) {
         report("setup", `The engine is not staged (${status.engine_path}). Run modules/upscayl/scripts/sync-engine.ps1, then reload.`);
       }
-      await loadModels();
+      models = await loadModels();
+      fillModels();
       $("page").dataset.status = "ready";
     } catch (err) {
       $("page").dataset.status = "error";
