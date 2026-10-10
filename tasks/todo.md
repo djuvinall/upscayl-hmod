@@ -6,7 +6,7 @@ Work items live in GitHub issues; this file holds only what is too small for one
 
 ## In flight
 
-- [ ] #14 panel — draft PR, built and hosted-tested; waits on Devon's layout call (two-pane / tabs / single column).
+- [ ] #14 panel — reworking into separate views (Run, Preview with a before/after slider, Models) with drag-and-drop, per Devon 2026-10-09.
 
 ## Next
 
@@ -14,8 +14,7 @@ Work items live in GitHub issues; this file holds only what is too small for one
 
 ## Blocked
 
-- [ ] `ci.yml` (#6) — blocked by: the SDK-in-CI decision (`decisions.md`). When Actions is enabled for it, disable `stale.yml`, `main.yml`, `build-windows.yml` in the same sitting.
-- [ ] Bundling the three CC BY-NC-SA models in the `.hmod` — blocked by: Devon's call. `sync-engine.ps1 -NoNonCommercial` already drops them.
+- [ ] Model packs (which models ship, and how packs are structured) — blocked by: Devon's answer on options A–D. `sync-engine.ps1 -NoNonCommercial` already drops the three CC BY-NC-SA models.
 
 ## Done (recent)
 

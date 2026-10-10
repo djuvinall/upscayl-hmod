@@ -2,6 +2,16 @@
 
 Newest first. Entries separated by `---`.
 
+## 2026-10-09 — No CI for now
+
+Devon's call on #6. The local gate (`cargo build`, `cargo test`, `cargo clippy --all-targets -- -D warnings`, `cargo fmt --check`, and a hosted check) stays the verification, recorded in each PR's *How it was verified*. #6 is closed; reopen it when CI earns a credential or the SDK becomes public.
+
+**Rejected for now — a PAT secret, and vendoring the SDK.** Same reasons as the entry below.
+
+**Consequence:** upstream's workflows stay dormant on the fork. If Actions is ever enabled, disable `stale.yml`, `main.yml` and `build-windows.yml` in the same sitting (CLAUDE.md, *Fork rules*).
+
+---
+
 ## 2026-10-08 — The module runs its own accept loop, around the SDK's guard
 
 `GET/DELETE api/assets/{id}` is part of the asset surface every owner serves, and the `hollowdeck-module` SDK matches exact paths only.
