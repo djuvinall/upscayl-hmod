@@ -2,6 +2,22 @@
 
 Newest first. Entries separated by `---`.
 
+## 2026-10-09 — One view per interface; views share state through the module's server
+
+Devon's call on #14: the image preview and the run panel are separate views (and so are the models), so people build their own workspaces, as HollowDeck intends. Three panels: `upscayl:main`, `upscayl:preview`, `upscayl:models`.
+
+INTEROP gives panels no channel to each other (`hdeck:open-panel` carries no payload, and there is no panel-to-panel message), so the shown result lives on the module's server: `POST api/select`, announced on a chunked `text/event-stream` at `api/live`, the pattern the Orchestrator's views use.
+
+A file dropped on a HollowDeck view arrives as a browser `File`, never a path, because the shell disables Tauri's drop handler so in-page drag and drop works. Dropped files are uploaded into the module's data dir and their results go to `<data>/outputs/` unless *Save to* names a folder.
+
+**Rejected — `BroadcastChannel` between the views.** Same-origin frames could use it, but INTEROP does not mention it, a second window or a restarted shell would not see past state, and the server already knows the jobs.
+
+**Rejected — asking HollowDeck for paths on drop.** It would mean re-enabling Tauri's drop handler, which breaks in-page drag and drop for every module (HollowDeck `shell/src-tauri/tests/windows_config.rs`).
+
+**Consequence:** an open Preview keeps the module from being idle-stopped; dropped files are copies, pruned after 7 days.
+
+---
+
 ## 2026-10-09 — No CI for now
 
 Devon's call on #6. The local gate (`cargo build`, `cargo test`, `cargo clippy --all-targets -- -D warnings`, `cargo fmt --check`, and a hosted check) stays the verification, recorded in each PR's *How it was verified*. #6 is closed; reopen it when CI earns a credential or the SDK becomes public.
