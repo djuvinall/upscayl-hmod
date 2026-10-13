@@ -2,7 +2,7 @@
 
 **Responsibility:** run upscale work that can outlive one tool call — large batches, TTA, double upscayl — and report on it.
 
-Three layers, of which **only the first is this repo's**. The first is built (#13); the other two are djuvinall/Orchestrator#93 and #94:
+Three layers, of which **only the first is this repo's**. The first is built (#13); the other two are djuvinall/orchestrator-hmod#93 and #94:
 
 | Layer | Owner | What |
 |---|---|---|
@@ -10,7 +10,7 @@ Three layers, of which **only the first is this repo's**. The first is built (#1
 | Timeout setting | **Orchestrator** | a global default tool timeout (today `HDECK_TOOL_TIMEOUT`, 300 s) as a setting, copied into each new graph, overridable per graph |
 | Per-job triggers | **Orchestrator** | several independent trigger points in one graph, so one graph can hold separate job pipelines like a project space |
 
-The Orchestrator layers are djuvinall/Orchestrator#93 (timeout setting, per-graph override) and #94 (several independently triggered pipelines per graph); nothing here can build them.
+The Orchestrator layers are djuvinall/orchestrator-hmod#93 (timeout setting, per-graph override) and #94 (several independently triggered pipelines per graph); nothing here can build them.
 
 ## Public interface
 
